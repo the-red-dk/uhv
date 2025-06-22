@@ -1,0 +1,284 @@
+Report: Questions Fixed in mcq.html (answer now matches option exactly)
+
+Below are the questions where the answer was updated to match the option exactly (including spaces and casing):
+
+Format:
+Question #
+Question text
+Original answer => Corrected answer
+
+// The following fixes were made automatically by the script in mcq.html:
+// (answer was set to exactly match the option string)
+
+// List of fixed questions:
+
+1. 14. A harmonious world is created by values at 4 levels, they are
+Original answer: Individual, family, society and nature/existence => Corrected answer: Individual, family, society and nature/existence
+
+2. 17. What are the basic human aspirations?
+Original answer: Both (a) and (b) => Corrected answer: Both (a) and (b) 
+
+3. 22. What is the content of self-exploration?
+Original answer: Both a and b => Corrected answer: Both a and b 
+
+4. 45. holistic development includes 
+Original answer: all the above => Corrected answer: all the above
+
+5. 67. Disrespect leads to 
+Original answer: All the above => Corrected answer: All the above 
+
+6. 71. We can feel being related to other when we have feeling for other 
+Original answer: Trust and respect => Corrected answer: Trust and respect 
+
+7. 109. Terms - opposition, reaction, anger, strife, court cases, divorce are related with
+Original answer: Family => Corrected answer: Family 
+
+8. 110. Increasing gap between rich and poor, fear, genocide, domination, exploitation, terrorism, war deal with 
+Original answer: Society => Corrected answer: Society 
+
+9. 111. Find the correct statement 
+Original answer: All => Corrected answer: All 
+
+10. 113. Human goal at the level of nature is 
+Original answer: Fearlessness => Corrected answer: Fearlessness 
+
+11. 114. Terms - definite, continuous, unconditional refers to 
+Original answer: All => Corrected answer: All 
+
+12. 119. The outcome of reverence is 
+Original answer: Gratitude => Corrected answer: Gratitude 
+
+13. 121. Complementariness means 
+Original answer: All => Corrected answer: All 
+
+14. 123. When we feel responsible for taking care of the relative. Thus, we are committed and make effort to ensure the physical facility or service required for nurturing and protection of the body of the relative. This is called 
+Original answer: Affection => Corrected answer: Affection 
+
+15. 124. In the process of sharing and ensuring right understanding in the other self, we can see that the other primarily sees our conduct, our behavior, our living first. She/ he listens and evaluates our words much later. So, if we want to communicate something to the other, it is essential to have the right understanding and live with the right feeling, right thought. Living with the right understanding, right feeling and thought is called
+Original answer: Affection => Corrected answer: Affection
+
+16. 126. which among the following is comprehensive human goal at the level of individual self(I) 
+Original answer: Right understanding => Corrected answer: Right understanding
+
+17. 127. which among the following is comprehensive human goal at the level of family 
+Original answer: prosperity => Corrected answer: prosperity 
+
+18. 128. which among the following is comprehensive human goal at the level of society 
+Original answer: trust => Corrected answer: trust 
+
+19. 129. which among the following is comprehensive human goal at the level of nature/existance 
+Original answer: mutual fulfillment => Corrected answer: mutual fulfillment
+
+20. 130. different names such as bliss, peace, satisfaction, happiness, fulfillment, salvation, contentment, enlightenment, liberation, independence, self-actualization, ecstasy, divinity, wellbeing of all etc have been used for 
+Original answer: mutual fulfillment => Corrected answer: mutual fulfillment
+
+21. 131. __________ seems to be the smallest unit of the social order where majority of thefunctions are being performed 
+Original answer: family => Corrected answer: family 
+
+22. 132. name of the model village in Bhutan
+Original answer: Menchri village => Corrected answer: Menchri village
+
+23. 133. which of the following are not the indicators for evaluation of dimensions of health 
+Original answer: having hospitals and medical store in every locality => Corrected answer: having hospitals and medical store in every locality 
+
+24. 134. which of the following are not the indicators for evaluation of dimensions of production 
+Original answer: producing more with a view of profit maximization => Corrected answer: producing more with a view of profit maximization
+
+25. 135. which among the following is the indicators for evaluation system implementation 
+Original answer: different dimensions of the system are running smoothly => Corrected answer: different dimensions of the system are running smoothly 
+
+26. 136. Families living together, in a relationship of mutual fulfilment with common goal is called 
+Original answer: Society => Corrected answer: Society 
+
+27. 137. People living together, but not in relationship of mutual fulfilment with differing goals is called 
+Original answer: Crowd => Corrected answer: Crowd 
+
+28. 138. People living separately, in opposition/struggle with conflicting goals is called 
+Original answer: Battlefield => Corrected answer: Battlefield 
+
+29. 139. Gold, silver, belongs to _________ order 
+Original answer: Physical => Corrected answer: Physical 
+
+30. 140. Conformation of material order is named as
+Original answer: Seed conformance => Corrected answer: Seed conformance 
+
+31. 141. The continuity of a plant species is maintained in nature by _______ method 
+Original answer: Seed conformance => Corrected answer: Seed conformance 
+
+32. 142. The basic activity of self of animal order is 
+Original answer: Recognition, fulfillment => Corrected answer: Recognition, fulfillment 
+
+33. 143. The continuity of animals is maintained in nature by _______ method 
+Original answer: Breed conformance => Corrected answer: Breed conformance 
+
+34. 144. The human being has ___________ conformance 
+Original answer: Right value/sanskaar => Corrected answer: Right value/sanskaar 
+
+35. 145. The innateness of Bio order is ________ 
+Original answer: Growth => Corrected answer: Growth 
+
+36. 146. There is __________ among the four orders of nature 
+Original answer: Mutual fulfillment => Corrected answer: Mutual fulfillment 
+
+37. 147. The basic activity of self of human being is _______ 
+Original answer: Knowing, assuming, recognition and fulfillment => Corrected answer: Knowing, assuming, recognition and fulfillment 
+
+38. 148. Our natural acceptance is to live in _______ with nature 
+Original answer: Harmony => Corrected answer: Harmony 
+
+39. 149. Space has constant or ___________ energy
+Original answer: Unlimited => Corrected answer: Unlimited 
+
+40. 150. When nature is submerged in space, we call it
+Original answer: UNIVERSE => Corrected answer: UNIVERSE 
+
+41. 151. Moral values is the combination of
+Original answer: Right vision and right resolve => Corrected answer: Right vision and right resolve
+
+42. 152. Wisdom/knowledge means
+Original answer: Right awareness and right concentration => Corrected answer: Right awareness and right concentration
+
+43. 153. Meditation includes
+Original answer: Right awareness and right concentration => Corrected answer: Right awareness and right concentration
+
+44. 154. Belief centric wisdom is
+Original answer: Knowledge based on listening => Corrected answer: Knowledge based on listening
+
+45. 155. Logic centric wisdom
+Original answer: Reasoning based knowledge => Corrected answer: Reasoning based knowledge
+
+46. 156. Realization centric wisdom is
+Original answer: Knowledge based on self-realisation of existential realities => Corrected answer: Knowledge based on self-realisation of existential realities
+
+47. 157. Non -violence means not hurting anyone by
+Original answer: All the above => Corrected answer: All the above
+
+48. 158. Truthfulness means
+Original answer: To be able to express the reality or events as is, uncoloured => Corrected answer: To be able to express the reality or events as is, uncoloured
+
+49. 159. Non stealing means
+Original answer: Using only those things that one has produced or obtained => Corrected answer: Using only those things that one has produced or obtained
+
+50. 160. Purity is at the level of 
+Original answer: Both a and b => Corrected answer: Both a and b 
+
+51. 161. Contentment means 
+Original answer: All the above => Corrected answer: All the above
+
+52. 162. Self-discipline means 
+Original answer: Able to practice and live in harmony on one's own right => Corrected answer: Able to practice and live in harmony on one's own right 
+
+53. 163. Being able to correctly recognize one's need for physical facility and living in harmony with that much is 
+Original answer: Contentment => Corrected answer: Contentment 
+
+54. 164. Wealth means 
+Original answer: Physical facility that is rightfully earned, in accordance with right understanding of natural laws => Corrected answer: Physical facility that is rightfully earned, in accordance with right understanding of natural laws 
+
+55. 165. 'laws of living in relationship and order ' means 
+Original answer: Right understanding of natural laws => Corrected answer: Right understanding of natural laws 
+
+56. 166. Liberation means 
+Original answer: All the above => Corrected answer: All the above
+
+57. 167. Which of the following is not the effect of non-possessiveness
+Original answer: We feel deprived => Corrected answer: We feel deprived
+
+58. 168. Free from hatred, unperturbed by evil in others is known as 
+Original answer: Equanimity => Corrected answer: Equanimity 
+
+59. 169. ____________ means to feel happy being with righteous people and to take inspiration from them 
+Original answer: Joy => Corrected answer: Joy 
+
+60. 170. Feeling of empathy and being helpful to others is named as 
+Original answer: Compassion => Corrected answer: Compassion 
+
+61. 171. Feeling of living together in relationship and harmony 
+Original answer: Friendliness => Corrected answer: Friendliness 
+
+62. 172. The service which is being ensured by the system 
+Original answer: Justice => Corrected answer: Justice 
+
+63. 173. The service which is being provided by the society through relationship is known as 
+Original answer: Social service => Corrected answer: Social service 
+
+64. 174. constitution is the compilation of 
+Original answer: all the above => Corrected answer: all the above
+
+65. 175. ____________ are important in the sense of living in a society
+Original answer: sanskaar and culture => Corrected answer: sanskaar and culture
+
+66. 176. _____________ have importance in terms of the exact implementation of the whole system 
+Original answer: law and order => Corrected answer: law and order 
+
+67. 177. the goal of education is 
+Original answer: To facilitate the process of developing those abilities in the individual which are essential for ensuring human society and order. => Corrected answer: To facilitate the process of developing those abilities in the individual which are essential for ensuring human society and order.
+
+68. 178. Clarity of our goals, programs etc., and knowledge of keeping activities of the self in harmony is what type of education?
+Original answer: education for participation in the system => Corrected answer: education for participation in the system 
+
+69. 179. education of right behavior in relationship with human being is termed as 
+Original answer: behavioral education => Corrected answer: behavioral education 
+
+70. 180. education about self-regulation, intake-daily routine in the context of keeping the body healthy is known as 
+Original answer: health education => Corrected answer: health education 
+
+71. 181. understanding of role of physical facility in nurturing and protection of the body and for social purpose is termed as 
+Original answer: education for right utilization => Corrected answer: education for right utilization 
+
+72. 182. education for production of necessary physical facility through work on natural resources is 
+Original answer: education for production => Corrected answer: education for production 
+
+73. 183. the main role of history subject is 
+Original answer: To help take inspiration from the right things of the past and wherever there was a deficiency, improve upon it after studying it and reviewing it. => Corrected answer: To help take inspiration from the right things of the past and wherever there was a deficiency, improve upon it after studying it and reviewing it.
+
+74. 184. a child starts to learn and understand by the method of 
+Original answer: Imitate and follow => Corrected answer: Imitate and follow 
+
+75. 185. while in the process of understanding, if self - verification is followed the person develops 
+Original answer: self-discipline and self confidence => Corrected answer: self-discipline and self confidence 
+
+76. 186. what are the aspects of personal transformation?
+Original answer: all the above => Corrected answer: all the above
+
+77. 187. 'No harm' to nature is an indicator of 
+Original answer: protection => Corrected answer: protection 
+
+78. 188. 'helping the nature to prosper' is an indicator of 
+Original answer: enrichment => Corrected answer: enrichment 
+
+79. 189. what type of production should be ensured at family level 
+Original answer: primary => Corrected answer: primary 
+
+80. 190. primary production should be ensured at the level of
+Original answer: family => Corrected answer: family
+
+81. 191. Secondary  production should be ensured at the level of
+Original answer: village clusters => Corrected answer: village clusters
+
+82. 192. tertiary production should be ensured at the level of
+Original answer: larger level => Corrected answer: larger level
+
+83. 193. Goal if exchange is 
+Original answer: to ensure the availability of necessary physical facility in different regions and time => Corrected answer: to ensure the availability of necessary physical facility in different regions and time 
+
+84. 194. goal of distribution is 
+Original answer: fulfilling the needs of every in the family- extending upto world family. => Corrected answer: fulfilling the needs of every in the family- extending upto world family.
+
+85. 195. exchange means 
+Original answer: all the above => Corrected answer: all the above
+
+86. 196. types of exchange are 
+Original answer: direct and indirect => Corrected answer: direct and indirect 
+
+87. 197. exchange of rice with wheat is 
+Original answer: direct exchange => Corrected answer: direct exchange 
+
+88. 198. sale and purchase of rice through money is 
+Original answer: indirect exchange => Corrected answer: indirect exchange 
+
+89. 199. what is the purpose of dimension of preservation 
+Original answer: enrichment and production of natural resources => Corrected answer: enrichment and production of natural resources 
+
+90. 200. what is the dimension of right utilization
+Original answer: enrichment and protection of Natural resources => Corrected answer: enrichment and protection of Natural resources
+

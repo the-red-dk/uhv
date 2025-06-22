@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MCQ Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Quicksand', 'Segoe UI', 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #ffe0ef 0%, #ffd6ec 100%);
+            margin: 0;
+            min-height: 100vh;
+            color: #a14c7e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Changed from flex-start to center */
+            height: 100vh; /* Ensure full viewport height for vertical centering */
+        }
+        .main-heading {
+            text-align: center;
+            font-size: 2.1em;
+            font-weight: 800;
+            color: #e75480;
+            margin-top: 0;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            font-family: 'Quicksand', 'Segoe UI', 'Roboto', Arial, sans-serif;
+            text-shadow: 0 2px 0 #fff6fa;
+        }
+        .quiz-container {
+            width: 100%;
+            max-width: 600px; /* Increased from 410px to 600px */
+            min-height: 520px; /* Increased min-height for more content */
+            aspect-ratio: unset; /* Remove aspect-ratio constraint */
+            margin: 0 auto 32px auto;
+            background: #fff0f7;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px 0 #f8b6d2cc;
+            padding: 32px 40px 32px 40px; /* More padding for larger content */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: stretch;
+            border: 2px solid #f8b6d2;
+            box-sizing: border-box;
+            overflow: hidden; /* Prevent content from overflowing */
+            word-break: break-word; /* Break long words if needed */
+        }
+        .question {
+            font-size: 1.08em;
+            margin-bottom: 18px;
+            font-weight: 700;
+            color: #e75480;
+            letter-spacing: 0.1px;
+            text-shadow: 0 1px 0 #fff6fa;
+        }
+        .options {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 18px;
+        }
+        .options li {
+            margin-bottom: 10px;
+            background: #ffe6f3;
+            border-radius: 12px; /* Keep previous border-radius */
+            border: 2px solid #f8b6d2;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 10px 24px;
+            color: #a14c7e;
+            background-color: transparent;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            box-shadow: 0 1px 4px #f8b6d233;
+            user-select: none;
+            width: 100%;
+            box-sizing: border-box;
+            white-space: normal;
+            overflow-wrap: break-word;
+        }
+        .options li::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            transform: scale(0.98); /* Slightly smaller for border effect */
+            z-index: -1;
+            background-color: #ffd6ec;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1), transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .options li:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .options li:hover {
+            color: #e75480;
+            scale: 1.07;
+            box-shadow: 0 0px 20px rgba(232, 84, 128, 0.18);
+            background-color: transparent;
+        }
+        .options li:active {
+            scale: 1;
+        }
+        .options li.selected, .options li:focus-within {
+            background: #ffd6ec;
+            border: 2.5px solid #e75480;
+            /* Remove box-shadow to eliminate black stroke */
+            box-shadow: none;
+            color: #e75480;
+        }
+        .options input[type="radio"] {
+            margin-right: 12px;
+            accent-color: #e75480;
+            width: 1em;
+            height: 1em;
+            cursor: pointer;
+        }
+        .feedback {
+            margin: 14px 0 10px 0;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        .correct { color: #e75480; }
+        .wrong { color: #ff6b6b; }
+        button,
+        button:focus {
+  font-size: 1em; /* Keep original size for consistency with theme */
+  padding: 10px 22px; /* Keep original padding for color consistency */
+  border-radius: 0.7rem;
+  background: #e75480; /* Keep original color */
+  color: #fff;
+  border: 2px solid rgb(50, 50, 50);
+  border-bottom: 5px solid rgb(50, 50, 50);
+  box-shadow: none; /* Remove glow */
+  transition: background 0.2s, border-bottom 0.2s, color 0.2s;
+}
+button:active {
+  transform: none;
+  border-bottom: 2px solid rgb(50, 50, 50);
+  transition: background 0.12s, border-bottom 0.12s, color 0.12s;
+}
+        @media (max-width: 600px) {
+            .main-heading { font-size: 1.2em; margin-top: 18px; }
+            .quiz-container { max-width: 99vw; padding: 8px 2vw; }
+            .question { font-size: 0.98em; }
+            .options li { font-size: 0.95em; padding: 7px 4px; }
+        }
+    </style>
+</head>
+<body>
+        <div class="main-heading">UHV - Test Your Marks</div>
+        <div class="quiz-container" id="quiz">
+            <!-- Quiz will be rendered here -->
+        </div>
+        <script>
+        // Questions array replaced with 200 questions from uhv.json (unnumbered)
+        const questions = [
+  {
+    "question": "One of the basic desire of every human being is to be always ____________",
+    "options": ["Sad", "Happy", "Laugh", "Earn money"],
+    "answer": "Happy"
+  },
+  {
+    "question": "What is the most basic human aspirations?",
+    "options": ["Happiness", "Prosperity", "Health", "Money"],
+    "answer": "Happiness"
+  },
+  {
+    "question": "What are the basic human aspirations?",
+    "options": ["Happiness and Prosperity", "Happiness and Respect", "Prosperity and Health", "Prosperity and Pease"],
+    "answer": "Happiness and Prosperity"
+  },
+  {
+    "question": "The value of any unit in this existence is in its ___________  in the larger order of which it is part",
+    "options": ["Participation", "Existence", "Performance", "Appearance"],
+    "answer": "Participation"
+  },
+  {
+    "question": "Value education deals with _________",
+    "options": ["What is universally valuable to all of us", "What is conductive to our individual and collective happiness", "Enables to be in harmony with ourselves, other and rest of nature", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "The need of value education is for",
+    "options": ["Correct identification of our aspiration", "Understanding universal human value to fulfill our aspirations in continuity", "Evaluation of beliefs", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "What are the guidelines of value education?",
+    "options": ["Universal in nature", "Rational or logical", "Natural and verifiable", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Value education enables us:",
+    "options": ["To understand our needs", "Visualise our goals correctly", "Indicate the direction for their fulfilment", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Technology is only means to achieve what is considered",
+    "options": ["Valuable for science", "Valuable for technology", "Valuable for humans", "None of the above"],
+    "answer": "Valuable for humans"
+  },
+  {
+    "question": "There is need to supplement: ",
+    "options": ["Technical education with science ", "Technical education with history ", "Technical education with politics ", "Technical education with value education"],
+    "answer": "Technical education with value education"
+  },
+  {
+    "question": "The purpose of value education is to ",
+    "options": ["Make the syllabus easy ", "Foster universal core value ", "Develop values in individuals ", "Both (a) and (c)"],
+    "answer": "Foster universal core value"
+  },
+  {
+    "question": "Self exploration uses two mechanisms- natural acceptance and ",
+    "options": ["Reason ", "Experimental validation ", "Logical thinking", "Theoretical concepts "],
+    "answer": "Experimental validation"
+  },
+  {
+    "question": "Harmony should be maintained in ",
+    "options": ["Between body and life ", "Between self and body ", "Between self and society ", "All the above "],
+    "answer": "All the above"
+  },
+  {
+    "question": "A harmonious world is created by values at 4 levels, they are ",
+    "options": ["Home, family, society and world ", "Individual, family, society and nature/existence", "Individual, family, city and universe ", "None of the above "],
+    "answer": "Individual, family, society and nature/existence"
+  },
+  {
+    "question": "Many human values seem good or right due to ",
+    "options": ["Positive feeling ", "Internal happiness ", "Natural acceptance ", "All the above "],
+    "answer": "All the above"
+  },
+  {
+    "question": "Which of the following is a positive value?",
+    "options": ["Self respect ", "Anger ", "Fear ", "Narrow mindedness "],
+    "answer": "Self respect"
+  },
+  {
+    "question": "What are the basic human aspirations?",
+    "options": ["Continuous happiness ", "Continuous Prosperity ", "Both (a) and (b) ", "None of the above "],
+    "answer": "Both (a) and (b)"
+  },
+  {
+    "question": "Universal human values means true at all",
+    "options": ["Time ", "Palaces", "Individual ", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "The process of self-exploration help to improving ",
+    "options": ["Right Understanding ", "Happiness ", "Relationship ", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Happiness is the realization of ",
+    "options": ["Resolution ", "Prosperity ", "Both a and b ", "None of the above"],
+    "answer": "Both a and b"
+  },
+  {
+    "question": "Today's education has very less role to play in order to ensure harmony in ",
+    "options": ["Individual ", "Family ", "Society ", "All the above "],
+    "answer": "All the above"
+  },
+  {
+    "question": "What is the content of self-exploration?",
+    "options": ["What is my desire?", "What is the program to achieve the desire?", "Both a and b ", "None of the above "],
+    "answer": "Both a and b"
+  },
+  {
+    "question": "Self-exploration demands examination and ___________ of our beliefs again and again",
+    "options": ["Validation ", "Presentation ", "Demonstration ", "representation "],
+    "answer": "Validation"
+  },
+  {
+    "question": "Two basic things in the content of self-exploration are to know my basic desires in life and second is to know how to ___________ ",
+    "options": ["Perform these ", "Remove these ", "Fulfill these ", "Forgot these "],
+    "answer": "Fulfill these"
+  },
+  {
+    "question": "Natural acceptance and _______ are two main process of knowing.",
+    "options": ["Self-actualisaton ", "Self-control ", "Self-exploration ", "Self evaluation "],
+    "answer": "Self-exploration"
+  },
+  {
+    "question": "If something is _________ to us, without any force or compulsion, then it is often correct and does not change with time and people.",
+    "options": ["Not acceptable ", "Completely acceptable ", "Naturally acceptable ", "Less acceptable"],
+    "answer": "Naturally acceptable"
+  },
+  {
+    "question": "The characteristics of natural acceptance are: ",
+    "options": ["Natural acceptance does not change with time and place ", "It does not depend on the place and our beliefs ", "It is constant and same for all of us ", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Most important condition needed to make us happy is __________ ",
+    "options": ["Right understanding ", "Right utilization ", "Right guidance ", "Right direction"],
+    "answer": "Right understanding"
+  },
+  {
+    "question": "What is the example of materialistic desire?",
+    "options": ["Happiness ", "Money ", "Pease ", "Respect "],
+    "answer": "Money"
+  },
+  {
+    "question": "What is the example of non-materialistic desire?",
+    "options": ["Happiness ", "Money ", "Big-house ", "Car "],
+    "answer": "Happiness"
+  },
+  {
+    "question": "What are the basic requirements for fulfilment of human aspirations?",
+    "options": ["Right understanding ", "Good relationship ", "Physical facilities ", "All the above "],
+    "answer": "All the above"
+  },
+  {
+    "question": "Life motivated by only physical facility leads to __________ ",
+    "options": ["Animal consciousness ", "Human consciousness ", "Child consciousness ", "Motivated consciousness "],
+    "answer": "Animal consciousness"
+  },
+  {
+    "question": "Acquiring more physical facility than required leads to get only _________ ",
+    "options": ["Self satisfaction ", "Right understanding ", "Happiness ", "Prosperity "],
+    "answer": "Self satisfaction"
+  },
+  {
+    "question": "Value education inculcates __________ in us.",
+    "options": ["Preconditioning ", "Fear ", "Right Understanding ", "Assumptions "],
+    "answer": "Right Understanding"
+  },
+  {
+    "question": "Value education gives us",
+    "options": ["Proposal ", "Self motivation, self discipline, ", "Self verification", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Moral education makes us ",
+    "options": ["Learn do's and don'ts ", "To Understand proposals with self verification ", "Self motivated ", "Self discipline"],
+    "answer": "To Understand proposals with self verification"
+  },
+  {
+    "question": "Value education is ",
+    "options": ["Universal ", "Rational ", "Verifiable ", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Value education enables us to ",
+    "options": ["Understand our aspirations ", "Visualize our goals and direction for fulfilling life ", "Remove our confusions and concerns ", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "The subject which enables us to learn the skills is called ",
+    "options": ["Skill development ", "Value education ", "Moral education ", "Phycology "],
+    "answer": "Skill development"
+  },
+  {
+    "question": "Which of the following is our basic aspiration ",
+    "options": ["Continuous effort ", "Expect to become something ", "Expect to get/do something ", "Expect to be continuously happy and prosperous "],
+    "answer": "Expect to be continuously happy and prosperous"
+  },
+  {
+    "question": "Life motivated by only physical facility leads to __________ ",
+    "options": ["Animal consciousness ", "Human consciousness ", "Child consciousness ", "Motivated consciousness "],
+    "answer": "Animal consciousness"
+  },
+  {
+    "question": "Which is on top order of priority for human consciousness ",
+    "options": ["Right understanding,", "physical facility,", "relationship ", "physical facility and relationship with right understanding"],
+    "answer": "physical facility and relationship with right understanding"
+  },
+  {
+    "question": "having physical facility with right understanding leads to ",
+    "options": ["happiness ", "prosperity ", "mutual prosperity ", "mutual happiness "],
+    "answer": "mutual prosperity"
+  },
+  {
+    "question": "having relationship with right understanding leads to",
+    "options": ["happiness ", "prosperity", "mutual prosperity ", "mutual happiness"],
+    "answer": "mutual happiness"
+  },
+  {
+    "question": "holistic development includes ",
+    "options": ["harmony in human being ", "harmony in family and society ", "harmony in nature / existence ", "all the above"],
+    "answer": "all the above"
+  },
+  {
+    "question": "which of the following is feelings in relationship ",
+    "options": ["food ", "cloths ", "shelter ", "trust and respect"],
+    "answer": "trust and respect"
+  },
+  {
+    "question": "which of the following is physical facility ",
+    "options": ["justice ", "food, shelter, cloths ", "trust ", "respect"],
+    "answer": "food, shelter, cloths"
+  },
+  {
+    "question": "which of the following is not a characteristic of natural acceptance ",
+    "options": ["it does not change with time ", "it does not change with place ", "it does not change with individual ", "it is corrupted by assumptions "],
+    "answer": "it is corrupted by assumptions"
+  },
+  {
+    "question": "prosperity means ",
+    "options": ["feeling of having more than required physical facility ", "feeling of having less physical facility ", "feeling of having more physical facility than my friend ", "deprived of physical facility "],
+    "answer": "feeling of having more than required physical facility"
+  },
+  {
+    "question": "self exploration is seeing beyond ",
+    "options": ["universe ", "house ", "box ", "your senses"],
+    "answer": "your senses"
+  },
+  {
+    "question": "_________ is the ability to perform a specific task, action or function successfully",
+    "options": ["Competence", "Performance", "Behavior", "Attitude"],
+    "answer": "Competence"
+  },
+  {
+    "question": "Society is and extension of :",
+    "options": ["Friends", "City", "Family", "Individual"],
+    "answer": "Individual"
+  },
+  {
+    "question": "Respect and trust are the need of the __________",
+    "options": ["Self", "Body", "Mind", "Understanding"],
+    "answer": "Self"
+  },
+  {
+    "question": "Knowing means we have the",
+    "options": ["Right understanding", "Confusion", "Pre conditioning", "All the above"],
+    "answer": "Right understanding"
+  },
+  {
+    "question": "Trust, respect and happiness etc are the needs of",
+    "options": ["Self", "Body", "Both (a) and (b)", "None of the above"],
+    "answer": "Both (a) and (b)"
+  },
+  {
+    "question": "The feeling of responsibility for nurturing, protection and right utilizing the body is",
+    "options": ["Sanyam", "Swasthya", "Both a and b", "None"],
+    "answer": "Both a and b"
+  },
+  {
+    "question": "The feeling in the self are",
+    "options": ["Definite", "Can't identify with clarity", "Variable", "Indefinite"],
+    "answer": "Can't identify with clarity"
+  },
+  {
+    "question": "The feeling of responsibility to ensure health of body of other is related with",
+    "options": ["Self-regulation", "Care", "Guidance", "Affection"],
+    "answer": "Care"
+  },
+  {
+    "question": "Right evaluation of each others intension and competence is called",
+    "options": ["Affection", "Love", "Respect", "Trust"],
+    "answer": "Respect"
+  },
+  {
+    "question": "If I say I am good for nothing it is a kind of ",
+    "options": ["Under evaluation ", "Right evaluation ", "Otherwise evaluation ", "Over evaluation"],
+    "answer": "Under evaluation"
+  },
+  {
+    "question": "Over evaluation causes ",
+    "options": ["Ego ", "Self confidence ", "Depression ", "Preconditioning"],
+    "answer": "Ego"
+  },
+  {
+    "question": "Under evaluation causes ",
+    "options": ["Ego ", "Self confidence ", "Depression ", "Preconditioning"],
+    "answer": "Depression"
+  },
+  {
+    "question": "Right evaluation causes ",
+    "options": ["Ego ", "Self confidence ", "Depression ", "Preconditioning"],
+    "answer": "Self confidence"
+  },
+  {
+    "question": "Right evaluation will be on the basis of ",
+    "options": ["Self ", "Body", "Wealth ", "Money"],
+    "answer": "Self"
+  },
+  {
+    "question": "There are __________ elements of justice ",
+    "options": ["9 ", "2 ", "5 ", "4 "],
+    "answer": "5"
+  },
+  {
+    "question": "________ is feeling of being related to all",
+    "options": ["Respect", "Care ", "Affection ", "Love "],
+    "answer": "Affection"
+  },
+  {
+    "question": "Disrespect leads to ",
+    "options": ["Ego ", "Depression ", "Acrimony ", "All the above "],
+    "answer": "All the above"
+  },
+  {
+    "question": "__________ is the basic unit of human interacton",
+    "options": ["Family ", "Society", "Nature ", "Individual"],
+    "answer": "Individual"
+  },
+  {
+    "question": "You have trust on intension on others, then you will feel ",
+    "options": ["Oppose to the other ", "Related to other ", "Sometimes oppose sometimes related ", "No feelings"],
+    "answer": "Related to other"
+  },
+  {
+    "question": "__________ is the right evaluation of the other on the basis of self(I) ",
+    "options": ["Respect ", "Reverence ", "Affection ", "Trust"],
+    "answer": "Respect"
+  },
+  {
+    "question": "We can feel being related to other when we have feeling for other ",
+    "options": ["Affection and gratitude ", "Care and respect ", "Trust and respect ", "Reverence and glory "],
+    "answer": "Trust and respect"
+  },
+  {
+    "question": "_______ is our ability to fulfill the aspiration.",
+    "options": ["Competence ", "Purpose ", "Potential ", "Program"],
+    "answer": "Competence"
+  },
+  {
+    "question": "There are __________ in relationship in one self(I1) for other self(I2) ",
+    "options": ["Expectations ", "Desires ", "Feelings ", "Thoughts "],
+    "answer": "Expectations"
+  },
+  {
+    "question": "Acceptance of excellence in others is called__________ ",
+    "options": ["Gratitude ", "Reverence ", "Glory ", "Love"],
+    "answer": "Reverence"
+  },
+  {
+    "question": "The problems in our relationship with varies entities are due to our ",
+    "options": ["Assumptions ", "Misunderstanding ", "Differentiation ", "Relationship"],
+    "answer": "Misunderstanding"
+  },
+  {
+    "question": "Based on the taste, the _________ is triggered ",
+    "options": ["Relation ", "Thoughts ", "Acceptance ", "Preconditioning"],
+    "answer": "Preconditioning"
+  },
+  {
+    "question": "In I(self), recognizing and fulfillment depends on",
+    "options": ["Value", "Relation ", "Assuming ", "None of the above"],
+    "answer": "Value"
+  },
+  {
+    "question": "Ability to do or perform is known as ",
+    "options": ["Value ", "Competence ", "Skill ", "Physical"],
+    "answer": "Competence"
+  },
+  {
+    "question": "Assuming without knowing is ",
+    "options": ["Knowing ", "Assuming ", "Preconditioning ", "Relationship"],
+    "answer": "Preconditioning"
+  },
+  {
+    "question": "Ensuring justice in relationship, on the basis of values leads to ",
+    "options": ["Fearlessness ", "Prosperity ", "Coexistence ", "Respect"],
+    "answer": "Coexistence"
+  },
+  {
+    "question": "Imagination is combination of ",
+    "options": ["Desire and thought ", "Desire, thought and expectation ", "Expectation and thought ", "Human senses"],
+    "answer": "Desire, thought and expectation"
+  },
+  {
+    "question": "'bhokta' means ",
+    "options": ["Doer ", "Seer ", "Enjoyer ", "None of the above"],
+    "answer": "Enjoyer"
+  },
+  {
+    "question": "Which of the following is not an aspect of relationship ",
+    "options": ["Relationship is not between one self (I1) and another self(I2) ", "There are nine feelings in relationship ", "Feelings can be recognized ", "Fulfilment, evaluation leads to mutual happiness"],
+    "answer": "Relationship is not between one self (I1) and another self(I2)"
+  },
+  {
+    "question": "You react angrily due to ",
+    "options": ["Behavior of others ", "You trust the intention of other ", "You doubt the intention of other ", "You had feeling of opposition"],
+    "answer": "You doubt the intention of other"
+  },
+  {
+    "question": "LOVE and COMPASSION deals with ",
+    "options": ["Right understanding in the self ", "Fulfilment in relationship ", "Ensuring more than required physical facility ", "None"],
+    "answer": "Right understanding in the self"
+  },
+  {
+    "question": "Mutual fulfilment is the hall mark of ",
+    "options": ["Guidance ", "Reverence ", "Justice ", "Glory"],
+    "answer": "Justice"
+  },
+  {
+    "question": "When we expect feeling from others for our happiness, it is a state of ",
+    "options": ["Swatantrata ", "Partantrata ", "Prosperity ", "None"],
+    "answer": "Partantrata"
+  },
+  {
+    "question": "PSRTSNTRATA deals with ",
+    "options": ["Within you don't have any definite feeling ", "If the other expresses right feeling, you feel “happy”", "If the other expresses wrong feeling, you feel “unhappy”", "All"],
+    "answer": "All"
+  },
+  {
+    "question": "We are similar on the basis of purpose, program and ",
+    "options": ["Intention ", "Competence ", "Potential ", "Imagination"],
+    "answer": "Intention"
+  },
+  {
+    "question": "“other is similar to me” it is the minimum content of ",
+    "options": ["Care ", "Guidance ", "Respect ", "Reverence"],
+    "answer": "Respect"
+  },
+  {
+    "question": "The statement “I and other want to live with continuous happiness and prosperity” indicates our ",
+    "options": ["Program ", "Potential ", "Purpose ", "Competence"],
+    "answer": "Purpose"
+  },
+  {
+    "question": "The statement “I and other want to understand and live in harmony at all four levels indicates ",
+    "options": ["Program ", "Potential ", "Purpose ", "Competence"],
+    "answer": "Program"
+  },
+  {
+    "question": "The statement “desire, thought and expectation are continuous in me as well as other” indicates ",
+    "options": ["Program ", "Potential ", "Purpose ", "Competence"],
+    "answer": "Potential"
+  },
+  {
+    "question": "The statement - “the other is similar to me and we are complementary to each other” indicates the complete content of",
+    "options": ["Care", "Guidance ", "Respect ", "Reverence"],
+    "answer": "Reverence"
+  },
+  {
+    "question": "The feeling of being related to other is called ",
+    "options": ["Care ", "Guidance ", "Respect ", "Affection"],
+    "answer": "Affection"
+  },
+  {
+    "question": "The feeling of responsibility and commitment for nurturing and protection of the body of my relative is ",
+    "options": ["Care ", "Guidance ", "Respect ", "Reverence"],
+    "answer": "Care"
+  },
+  {
+    "question": "The feeling of responsibility and commitment for ensuring right understanding and right feeling in the self of my relative is ",
+    "options": ["Care ", "Guidance ", "Respect ", "Reverence"],
+    "answer": "Guidance"
+  },
+  {
+    "question": "Care and guidance are the two outcomes of ",
+    "options": ["Glory ", "Guidance ", "Respect ", "Affection"],
+    "answer": "Affection"
+  },
+  {
+    "question": "The feeling of acceptance for excellence is called ",
+    "options": ["Care ", "Guidance ", "Respect ", "Reverence"],
+    "answer": "Reverence"
+  },
+  {
+    "question": "The outcome of reverence is",
+    "options": ["Glory ", "Worship ", "Trust ", "gratitude"],
+    "answer": "Trust"
+  },
+  {
+    "question": "Which one explains about society",
+    "options": ["People living together, in a relationship of mutual fulfillment", "People living together, but not in relationship of mutual fulfilment", "People living separately, in opposition/struggle", "None of the above"],
+    "answer": "People living together, in a relationship of mutual fulfillment"
+  },
+  {
+    "question": "How the transition in society can be made possible",
+    "options": ["Recognize where change is required so that effort can be made in these areas", "Collective effort is essential for the change and effective functioning of a human society", "Proper coordination amongst people who are thinking, making effort for societal changes", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Societymeans",
+    "options": ["Human being living together and making collective effort for happiness and prosperity", "Many families living together making collective effort for a common goal", "Human being as a basic unit", "Human cell as a basic unit"],
+    "answer": "Human being living together and making collective effort for happiness and prosperity"
+  },
+  {
+    "question": "The word “society” is primarily used in the context of human-_____________ relationship",
+    "options": ["Nature", "Existence", "Human", "Family"],
+    "answer": "Human"
+  },
+  {
+    "question": "Human - human interaction is called",
+    "options": ["Work", "Behavior", "System", "None"],
+    "answer": "Behavior"
+  },
+  {
+    "question": "Human - rest of nature interaction is called",
+    "options": ["Behavior", "Work", "Production", "All"],
+    "answer": "All"
+  },
+  {
+    "question": "While evaluating present state of the society and system, we found climate change, environmental pollution, and resource depletion. This is related with",
+    "options": ["Individual", "Family", "Society", "Relationship with rest of nature"],
+    "answer": "Relationship with rest of nature"
+  },
+  {
+    "question": "Terms - aimlessness, confusion, tension, frustration, depression, alcoholism, substance abuse, obesity, suicide deal with",
+    "options": ["Individual", "Family", "Society", "Relationship with rest of nature"],
+    "answer": "Individual"
+  },
+  {
+    "question": "Terms - opposition, reaction, anger, strife, court cases, divorce are related with",
+    "options": ["Individual ", "Family ", "Society ", "Relationship with rest of nature"],
+    "answer": "Family "
+  },
+  {
+    "question": "Increasing gap between rich and poor, fear, genocide, domination, exploitation, terrorism, war deal with ",
+    "options": ["Individual ", "Family ", "Society ", "Relationship with rest of nature "],
+    "answer": "Society "
+  },
+  {
+    "question": "Find the correct statement ",
+    "options": ["Collective effort is essential for the change and effective functioning of a human society, order, ", "Individual effort can merely initiate societal changes ", "There is a need for proper coordination amongst people who are thinking, making effort for societal changes ", "All "],
+    "answer": "All "
+  },
+  {
+    "question": "Human goal at the level of society is ",
+    "options": ["Prosperity ", "Fearlessness ", "Co-existence ", "Right understanding "],
+    "answer": "Co-existence"
+  },
+  {
+    "question": "Human goal at the level of nature is ",
+    "options": ["Prosperity ", "Fearlessness ", "Co-existence ", "Right understanding "],
+    "answer": "Fearlessness "
+  },
+  {
+    "question": "Terms - definite, continuous, unconditional refers to ",
+    "options": ["Right understanding ", "Right feeling ", "Swatantrata ", "All "],
+    "answer": "All "
+  },
+  {
+    "question": "When we expect feeling from others for our happiness, if is a state of ",
+    "options": ["Swatantra ", "Partantrata ", "Prosperity ", "None"],
+    "answer": "Partantrata"
+  },
+  {
+    "question": "Understanding and living in harmony at all 4 levels of beings is called ",
+    "options": ["Competition ", "Excellence ", "Reverence ", "Gratitude"],
+    "answer": "Excellence"
+  },
+  {
+    "question": "In ___________, one helps to bring the other to his level",
+    "options": ["Excellence", "Reverence ", "Glory ", "None"],
+    "answer": "Reverence "
+  },
+  {
+    "question": "In_________ one hinders the other from reaching to his level ",
+    "options": ["Competition ", "Excellence ", "Reverence ", "Gratitude"],
+    "answer": "Competition "
+  },
+  {
+    "question": "The outcome of reverence is ",
+    "options": ["Glory ", "Worship ", "Gratitude ", "None"],
+    "answer": "Gratitude "
+  },
+  {
+    "question": "Effort made to achieve excellence is ",
+    "options": ["Love ", "Worship ", "Trust ", "None"],
+    "answer": "Worship"
+  },
+  {
+    "question": "Complementariness means ",
+    "options": ["Able to be helpful to each other ", "Able to be willing co-workers, to collaborate in work ", "Able to be together, participate together ", "All "],
+    "answer": "All "
+  },
+  {
+    "question": "Transparency is the situation when",
+    "options": ["My evaluation about myself is the same as my evaluation by the other ", "My evaluation about the other is the same as the evaluation of the other by the other", "I know that I have rightly evaluated the other ", "The other knows that s(he) has rightly evaluated me "],
+    "answer": "My evaluation about myself is the same as my evaluation by the other "
+  },
+  {
+    "question": "When we feel responsible for taking care of the relative. Thus, we are committed and make effort to ensure the physical facility or service required for nurturing and protection of the body of the relative. This is called ",
+    "options": ["Trust ", "Generosity ", "Affection ", "None"],
+    "answer": "Affection "
+  },
+  {
+    "question": "In the process of sharing and ensuring right understanding in the other self, we can see that the other primarily sees our conduct, our behavior, our living first. She/ he listens and evaluates our words much later. So, if we want to communicate something to the other, it is essential to have the right understanding and live with the right feeling, right thought. Living with the right understanding, right feeling and thought is called",
+    "options": ["Trust ", "Generosity ", "Affection", "Spontaneity"],
+    "answer": "Affection"
+  },
+  {
+    "question": "The activities which do not produce anything but are concerned with protection/maintenance come in category of ",
+    "options": ["Production ", "Service ", "Preservation ", "Right utilization"],
+    "answer": "Service "
+  },
+  {
+    "question": "which among the following is comprehensive human goal at the level of individual self(I) ",
+    "options": ["fearlessness ", "trust ", "mutual fulfillment ", "right understanding "],
+    "answer": "Right understanding"
+  },
+  {
+    "question": "which among the following is comprehensive human goal at the level of family ",
+    "options": ["fearlessness ", "prosperity ", "mutual fulfillment ", "right understanding "],
+    "answer": "prosperity "
+  },
+  {
+    "question": "which among the following is comprehensive human goal at the level of society ",
+    "options": ["fearlessness ", "trust ", "mutual fulfillment ", "right understanding "],
+    "answer": "trust "
+  },
+  {
+    "question": "which among the following is comprehensive human goal at the level of nature/existance ",
+    "options": ["fearlessness ", "trust ", "mutual fulfillment ", "right understanding "],
+    "answer": "mutual fulfillment"
+  },
+  {
+    "question": "different names such as bliss, peace, satisfaction, happiness, fulfillment, salvation, contentment, enlightenment, liberation, independence, self-actualization, ecstasy, divinity, wellbeing of all etc have been used for ",
+    "options": ["physical facility ", "sensations ", "fearlessness ", "mutual fulfillment "],
+    "answer": "mutual fulfillment"
+  },
+  {
+    "question": "__________ seems to be the smallest unit of the social order where majority of thefunctions are being performed ",
+    "options": ["family ", "village ", "system ", "none"],
+    "answer": "family "
+  },
+  {
+    "question": "name of the model village in Bhutan",
+    "options": ["Menchri village", "khejari village ", "tsangpo village ", "none"],
+    "answer": "Menchri village"
+  },
+  {
+    "question": "which of the following are not the indicators for evaluation of dimensions of health ",
+    "options": ["having hospitals and medical store in every locality ", "good life style and fast recovery from illness ", "life survival period ", "period over which people remain healthy"],
+    "answer": "having hospitals and medical store in every locality "
+  },
+  {
+    "question": "which of the following are not the indicators for evaluation of dimensions of production ",
+    "options": ["every family engaged in some meaningful production ", "every family able to feel the prosperity ", "ensure mutual enrichment with rest of nature ", "producing more with a view of profit maximization"],
+    "answer": "producing more with a view of profit maximization"
+  },
+  {
+    "question": "which among the following is the indicators for evaluation system implementation ",
+    "options": ["different dimensions of the system are running smoothly ", "the system has to put in lot of efforts to do so ", "bigger and bigger structure of central administration to make the different dimension work ", "more and more enforcement through strict laws and police force."],
+    "answer": "different dimensions of the system are running smoothly "
+  },
+  {
+    "question": "Families living together, in a relationship of mutual fulfilment with common goal is called ",
+    "options": ["Crowd ", "Battlefield ", "Society ", "None of the above "],
+    "answer": "Society "
+  },
+  {
+    "question": "People living together, but not in relationship of mutual fulfilment with differing goals is called ",
+    "options": ["Crowd ", "Battlefield ", "Society ", "None of the above "],
+    "answer": "Crowd "
+  },
+  {
+    "question": "People living separately, in opposition/struggle with conflicting goals is called ",
+    "options": ["Crowd ", "Battlefield ", "Society ", "None of the above "],
+    "answer": "Battlefield "
+  },
+  {
+    "question": "Gold, silver, belongs to _________ order ",
+    "options": ["Physical ", "Bio ", "Animal ", "Human "],
+    "answer": "Physical"
+  },
+  {
+    "question": "Conformation of material order is named as",
+    "options": ["Right value sanskar ", "Seed conformance ", "Breed conformance ", "Constitution conformance"],
+    "answer": "Seed conformance "
+  },
+  {
+    "question": "The continuity of a plant species is maintained in nature by _______ method ",
+    "options": ["Right value sanskar ", "Seed conformance ", "Breed conformance ", "Constitution conformance"],
+    "answer": "Seed conformance "
+  },
+  {
+    "question": "The basic activity of self of animal order is ",
+    "options": ["Assuming, recognition and fulfillment ", "Knowing, assuming, recognition and fulfillment ", "Recognition, fulfillment ", "Selection and testing"],
+    "answer": "Recognition, fulfillment "
+  },
+  {
+    "question": "The continuity of animals is maintained in nature by _______ method ",
+    "options": ["Right value sanskar ", "Seed conformance ", "Breed conformance ", "Constitution conformance"],
+    "answer": "Breed conformance "
+  },
+  {
+    "question": "The human being has ___________ conformance ",
+    "options": ["Right value/sanskaar ", "Breed conformance ", "Constitution conformance ", "Seed conformance"],
+    "answer": "Right value/sanskaar "
+  },
+  {
+    "question": "The innateness of Bio order is ________ ",
+    "options": ["Cruelty/non-cruelty ", "Existence ", "Growth ", "Nurture "],
+    "answer": "Growth "
+  },
+  {
+    "question": "There is __________ among the four orders of nature ",
+    "options": ["Inherent struggle ", "No dependency ", "Mutual fulfillment ", "Opposition "],
+    "answer": "Mutual fulfillment "
+  },
+  {
+    "question": "The basic activity of self of human being is _______ ",
+    "options": ["Recognition and fulfilment ", "Selection and testing ", "Composition and decomposition ", "Knowing, assuming, recognition and fulfillment "],
+    "answer": "Knowing, assuming, recognition and fulfillment "
+  },
+  {
+    "question": "Our natural acceptance is to live in _______ with nature ",
+    "options": ["Harmony ", "Struggle for survival ", "Opposition ", "None of the above "],
+    "answer": "Harmony "
+  },
+  {
+    "question": "Space has constant or ___________ energy",
+    "options": ["Unlimited ", "Variable ", "Limited", "Equilibrium"],
+    "answer": "Unlimited "
+  },
+  {
+    "question": "When nature is submerged in space, we call it",
+    "options": ["UNIVERSE ", "GALAXY ", "EXISTANCE ", "NONE OF THE ABOVE"],
+    "answer": "UNIVERSE "
+  },
+  {
+    "question": "Moral values is the combination of",
+    "options": ["Right speech and right action", "Right vision and right resolve", "Right livelihood and right effort", "Right awareness and right concentration"],
+    "answer": "Right vision and right resolve"
+  },
+  {
+    "question": "Wisdom/knowledge means",
+    "options": ["Right speech and right action", "Right vision and right resolve", "Right livelihood and right effort", "Right awareness and right concentration"],
+    "answer": "Right awareness and right concentration"
+  },
+  {
+    "question": "Meditation includes",
+    "options": ["Right speech and right action", "Right vision and right resolve", "Right livelihood and right effort", "Right awareness and right concentration"],
+    "answer": "Right awareness and right concentration"
+  },
+  {
+    "question": "Belief centric wisdom is",
+    "options": ["Knowledge based on listening", "Knowledge based on self-realisation of existential realities", "Reasoning based knowledge", "None of the above"],
+    "answer": "Knowledge based on listening"
+  },
+  {
+    "question": "Logic centric wisdom",
+    "options": ["Knowledge based on listening", "Knowledge based on self-realisation of existential realities", "Reasoning based knowledge", "None of the above"],
+    "answer": "Reasoning based knowledge"
+  },
+  {
+    "question": "Realization centric wisdom is",
+    "options": ["Knowledge based on listening", "Knowledge based on self-realisation of existential realities", "Reasoning based knowledge", "None of the above"],
+    "answer": "Knowledge based on self-realisation of existential realities"
+  },
+  {
+    "question": "Non -violence means not hurting anyone by",
+    "options": ["Body", "Mind", "Speech", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Truthfulness means",
+    "options": ["To say something that is good for others at a particular time", "To say what has occurred", "To be able to express the reality or events as is, uncoloured", "To say something that seems to be beneficial"],
+    "answer": "To be able to express the reality or events as is, uncoloured"
+  },
+  {
+    "question": "Non stealing means",
+    "options": ["Using only those things that one has produced or obtained", "to feel ones right only on such things", "Understanding the basic laws, principles associated with sensation", "Not accumulating things that are unessential "],
+    "answer": "Using only those things that one has produced or obtained"
+  },
+  {
+    "question": "Purity is at the level of ",
+    "options": ["Body - cleanliness ", "Mind - being free from mental disorders ", "Both a and b ", "None of the above"],
+    "answer": "Both a and b "
+  },
+  {
+    "question": "Contentment means ",
+    "options": ["Being able to correctly recognize one's need for physical facility and living in harmony with that much ", "Right, appropriate behavior even in adverse states/situations ", "Living with sincerity, simplicity ", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Self-discipline means ",
+    "options": ["Able to practice and live in harmony on one's own right ", "Being able to correctly recognize one's need for physical facility and living in harmony with that much ", "Right, appropriate behavior even in adverse states/situations ", "Living with sincerity, simplicity "],
+    "answer": "Able to practice and live in harmony on one's own right "
+  },
+  {
+    "question": "Being able to correctly recognize one's need for physical facility and living in harmony with that much is ",
+    "options": ["Self-reflection ", "Self-discipline ", "Contentment ", "Non-possessiveness "],
+    "answer": "Contentment "
+  },
+  {
+    "question": "Wealth means ",
+    "options": ["Physical facility that is rightfully earned, in accordance with right understanding of natural laws ", "Money only ", "Happiness ", "All the above"],
+    "answer": "Physical facility that is rightfully earned, in accordance with right understanding of natural laws "
+  },
+  {
+    "question": "'laws of living in relationship and order ' means ",
+    "options": ["Right understanding of natural laws ", "Liberation ", "Wealth ", "Fulfillment of wishes"],
+    "answer": "Right understanding of natural laws "
+  },
+  {
+    "question": "Liberation means ",
+    "options": ["To see the existence clearly ", "To see reality as it is ", "To be rid of all types of misunderstandings, confusions ", "All the above"],
+    "answer": "All the above"
+  },
+  {
+    "question": "Which of the following is not the effect of non-possessiveness",
+    "options": ["We are able to fulfill our needs by way of right utilization", "Things are available for use by others in the society", "Preservation and enrichment of natural resources", "We feel deprived"],
+    "answer": "We feel deprived"
+  },
+  {
+    "question": "Free from hatred, unperturbed by evil in others is known as ",
+    "options": ["Friendliness ", "Compassion ", "Joy ", "Equanimity"],
+    "answer": "Equanimity"
+  },
+  {
+    "question": "____________ means to feel happy being with righteous people and to take inspiration from them ",
+    "options": ["Friendliness ", "Compassion ", "Joy ", "Equanimity"],
+    "answer": "Joy "
+  },
+  {
+    "question": "Feeling of empathy and being helpful to others is named as ",
+    "options": ["Friendliness ", "Compassion ", "Joy ", "Equanimity"],
+    "answer": "Compassion "
+  },
+  {
+    "question": "Feeling of living together in relationship and harmony ",
+    "options": ["Friendliness ", "Compassion ", "Joy ", "Equanimity"],
+    "answer": "Friendliness "
+  },
+  {
+    "question": "The service which is being ensured by the system ",
+    "options": ["administrative service ", "Social service ", "Justice ", "Education "],
+    "answer": "Justice "
+  },
+  {
+    "question": "The service which is being provided by the society through relationship is known as ",
+    "options": ["administrative service ", "Social service ", "Justice ", "Education "],
+    "answer": "Social service "
+  },
+  {
+    "question": "constitution is the compilation of ",
+    "options": ["rules and regulation for living together ", "ethical guidelines on how to live an harmonious life in the society ", "containing basic principles and guidelines relating to human living and his participation in this existence ", "all the above"],
+    "answer": "all the above"
+  },
+  {
+    "question": "____________ are important in the sense of living in a society",
+    "options": ["law and order ", "production and work ", "culture and civilization", "sanskaar and culture"],
+    "answer": "sanskaar and culture"
+  },
+  {
+    "question": "_____________ have importance in terms of the exact implementation of the whole system ",
+    "options": ["law and order ", "production and work ", "culture and civilization ", "sanskaar and culture"],
+    "answer": "law and order "
+  },
+  {
+    "question": "the goal of education is ",
+    "options": ["To facilitate the process of developing those abilities in the individual which are essential for ensuring human society and order.", "only preparing human being to earn money ", "to earn respect from others through degree ", "none of the above"],
+    "answer": "To facilitate the process of developing those abilities in the individual which are essential for ensuring human society and order."
+  },
+  {
+    "question": "Clarity of our goals, programs etc., and knowledge of keeping activities of the self in harmony is what type of education?",
+    "options": ["mental education ", "behavioral education ", "health education ", "education for participation in the system "],
+    "answer": "education for participation in the system "
+  },
+  {
+    "question": "education of right behavior in relationship with human being is termed as ",
+    "options": ["mental education ", "behavioral education ", "health education ", "education for participation in the system "],
+    "answer": "behavioral education "
+  },
+  {
+    "question": "education about self-regulation, intake-daily routine in the context of keeping the body healthy is known as ",
+    "options": ["mental education ", "behavioral education ", "health education ", "education for participation in the system "],
+    "answer": "health education "
+  },
+  {
+    "question": "understanding of role of physical facility in nurturing and protection of the body and for social purpose is termed as ",
+    "options": ["education for production ", "health education ", "education for right utilization ", "education for participation in the system "],
+    "answer": "education for right utilization "
+  },
+  {
+    "question": "education for production of necessary physical facility through work on natural resources is ",
+    "options": ["education for production ", "education for right utilization ", "education for participation in the system ", "none of the above"],
+    "answer": "education for production "
+  },
+  {
+    "question": "the main role of history subject is ",
+    "options": ["To help take inspiration from the right things of the past and wherever there was a deficiency, improve upon it after studying it and reviewing it.", "Learn how some of the human beings exploited others.", "getting inspiration that having power and physical facilities is more important than relationship ", "all the above "],
+    "answer": "To help take inspiration from the right things of the past and wherever there was a deficiency, improve upon it after studying it and reviewing it."
+  },
+  {
+    "question": "a child starts to learn and understand by the method of ",
+    "options": ["Imitate and follow ", "imitate and obedience ", "follow and obedience ", "obedience and self- verification "],
+    "answer": "Imitate and follow "
+  },
+  {
+    "question": "while in the process of understanding, if self - verification is followed the person develops ",
+    "options": ["opposition and self confidence ", "self-discipline and self confidence ", "struggle and opposition ", "self-discipline and opposition "],
+    "answer": "self-discipline and self confidence "
+  },
+  {
+    "question": "what are the aspects of personal transformation?",
+    "options": ["self-verification ", "self-evaluation ", "self-awareness ", "all the above "],
+    "answer": "all the above"
+  },
+  {
+    "question": "'No harm' to nature is an indicator of ",
+    "options": ["protection ", "production ", "enrichment ", "right utilization "],
+    "answer": "protection "
+  },
+  {
+    "question": "'helping the nature to prosper' is an indicator of ",
+    "options": ["protection ", "production ", "enrichment ", "right utilization "],
+    "answer": "enrichment "
+  },
+  {
+    "question": "what type of production should be ensured at family level ",
+    "options": ["tertiary ", "primary ", "secondary ", "none"],
+    "answer": "primary "
+  },
+  {
+    "question": "primary production should be ensured at the level of",
+    "options": ["family", "village", "village clusters", "larger level"],
+    "answer": "family"
+  },
+  {
+    "question": "Secondary  production should be ensured at the level of",
+    "options": ["family", "village", "village clusters", "larger level"],
+    "answer": "village clusters"
+  },
+  {
+    "question": "tertiary production should be ensured at the level of",
+    "options": ["family", "village", "village clusters", "larger level"],
+    "answer": "larger level"
+  },
+  {
+    "question": "Goal if exchange is ",
+    "options": ["to ensure the availability of necessary physical facility in different regions and time ", "profit earning ", "developing self ", "none of the above"],
+    "answer": "to ensure the availability of necessary physical facility in different regions and time "
+  },
+  {
+    "question": "goal of distribution is ",
+    "options": ["publicity ", "profit earning ", "fulfilling the needs of every in the family- extending upto world family.", "none of the above "],
+    "answer": "fulfilling the needs of every in the family- extending upto world family."
+  },
+  {
+    "question": "exchange means ",
+    "options": ["to ensure the availability of necessary physical facility in different regions and time ", "no production happens in this process ", "it is for mutual fulfillment, not for exploitation ", "all the above"],
+    "answer": "all the above"
+  },
+  {
+    "question": "types of exchange are ",
+    "options": ["direct and indirect ", "active and passive ", "small and large ", "physical and non physical "],
+    "answer": "direct and indirect "
+  },
+  {
+    "question": "exchange of rice with wheat is ",
+    "options": ["indirect exchange ", "direct exchange ", "physical exchange ", "profit exchange"],
+    "answer": "direct exchange "
+  },
+  {
+    "question": "sale and purchase of rice through money is ",
+    "options": ["indirect exchange ", "direct exchange ", "physical exchange ", "profit exchange"],
+    "answer": "indirect exchange "
+  },
+  {
+    "question": "what is the purpose of dimension of preservation ",
+    "options": ["prosperity in human being", "enrichment and production of natural resources ", "to ensure the availability of necessary physical facilities ", "fulfilling the needs of everyone"],
+    "answer": "enrichment and production of natural resources "
+  },
+  {
+    "question": "what is the dimension of right utilization",
+    "options": ["enrichment and protection of Natural resources", "prosperity in Human being ", "to ensure the availability of necessary physical facilities", "fulfilling the needs of everyone"],
+    "answer": "enrichment and protection of Natural resources"
+  }
+].map(q => {
+  // Fix: Ensure answer matches exactly one of the options (including spaces and casing)
+  if (Array.isArray(q.options)) {
+    const match = q.options.find(opt => opt === q.answer);
+    if (!match) {
+      // Try to match ignoring spaces/casing, then set answer to the exact option string
+      const norm = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
+      const found = q.options.find(opt => norm(opt) === norm(q.answer));
+      if (found) q.answer = found;
+    }
+  }
+  return {
+    ...q,
+    question: typeof q.question === 'string' ? q.question.replace(/^\s*\d+\.?\s*/, '') : q.question
+  };
+});
+
+// Shuffle questions array every time the site is loaded
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+shuffleArray(questions);
+
+        let current = 0, score = 0, answered = false;
+
+        function renderQuestion() {
+            const q = questions[current];
+            const quiz = document.getElementById('quiz');
+            quiz.innerHTML = `
+                <div id="score-counter" style="font-size:1.1em;font-weight:700;color:#e75480;margin-bottom:10px;text-align:center;">Score: ${score}</div>
+                <div class="question">${current+1}. ${q.question}</div>
+                <ul class="options">
+                    ${q.options.map((opt, i) => `
+                        <li tabindex="0" onclick="selectOption(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){selectOption(${i})}">
+                            <label style="width:100%;display:flex;align-items:center;cursor:pointer;">
+                                <input type="radio" name="option" value="${opt}" style="pointer-events:none;" ${answered ? 'disabled' : ''}>
+                                <span style="flex:1;">${opt}</span>
+                            </label>
+                        </li>
+                    `).join('')}
+                </ul>
+                <div class="feedback" id="feedback"></div>
+                <button id="submit" ${answered ? 'disabled' : ''}>Submit</button>
+                <div id="countdown" style="font-weight:bold; font-size:1.2em; margin:10px 0 0 0;"></div>
+                <div style="margin-top:18px;font-size:1.1em;">Question ${current+1} of ${questions.length}</div>
+            `;
+
+            document.getElementById('submit').onclick = submitAnswer;
+            // Highlight selected option if any
+            if(window.selectedOptionIdx !== undefined) {
+                const lis = document.querySelectorAll('.options li');
+                lis[window.selectedOptionIdx]?.classList.add('selected');
+            }
+        }
+
+        // Make the whole option selectable
+        window.selectedOptionIdx = undefined;
+        function selectOption(idx) {
+            if(answered) return;
+            window.selectedOptionIdx = idx;
+            const lis = document.querySelectorAll('.options li');
+            lis.forEach((li, i) => {
+                li.classList.toggle('selected', i === idx);
+                li.querySelector('input[type="radio"]').checked = (i === idx);
+            });
+            document.getElementById('feedback').textContent = '';
+        }
+
+        function submitAnswer() {
+            const radios = document.querySelectorAll('input[name="option"]');
+            let selected = null;
+            radios.forEach((r, i) => { if(r.checked) selected = r.value; });
+            const feedback = document.getElementById('feedback');
+            if (!selected) {
+                feedback.textContent = "Please select an option.";
+                feedback.className = "feedback wrong";
+                return;
+            }
+            answered = true;
+            document.getElementById('submit').disabled = true;
+            // Remove Next button if present
+            const nextBtn = document.getElementById('next');
+            if (nextBtn) nextBtn.remove();
+            if (selected === questions[current].answer) {
+                feedback.textContent = "Correct!";
+                feedback.className = "feedback correct";
+                score++;
+                // Update score counter immediately
+                document.getElementById('score-counter').textContent = `Score: ${score}`;
+            } else {
+                feedback.textContent = `Wrong! Correct answer: ${questions[current].answer}`;
+                feedback.className = "feedback wrong";
+            }
+            // Disable all radios
+            radios.forEach(r => r.disabled = true);
+
+            // Add 2-second countdown: 3, 2, 1 (each for ~0.67s)
+            let countdown = 3;
+            let counterDiv = document.getElementById('countdown');
+            if (!counterDiv) {
+                counterDiv = document.createElement('div');
+                counterDiv.id = 'countdown';
+                counterDiv.style.fontWeight = 'bold';
+                counterDiv.style.fontSize = '1.2em';
+                counterDiv.style.margin = '10px 0 0 0';
+                feedback.insertAdjacentElement('afterend', counterDiv);
+            }
+            counterDiv.textContent = `Next question in: ${countdown}`;
+            let ticks = 0;
+            const interval = setInterval(() => {
+                ticks++;
+                countdown--;
+                if (countdown > 0) {
+                    counterDiv.textContent = `Next question in: ${countdown}`;
+                } else {
+                    clearInterval(interval);
+                    counterDiv.remove();
+                    nextQuestion();
+                }
+            }, 667); // 2 seconds for 3,2,1
+        }
+
+        function nextQuestion() {
+            answered = false;
+            window.selectedOptionIdx = undefined;
+            current++;
+            if (current < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const quiz = document.getElementById('quiz');
+            const percent = Math.round((score / questions.length) * 100);
+            quiz.innerHTML = `
+                <div class="question">Quiz Completed!</div>
+                <div class="feedback correct">Your Score: ${score} / ${questions.length}</div>
+                <div class="feedback">Percentage: ${percent}%</div>
+                <button onclick="location.reload()">Restart</button>
+            `;
+        }
+
+        renderQuestion();
+    </script>
+    <script>
+// Remove bounce-out animation logic
+window.addEventListener('DOMContentLoaded', function() {
+  // No bounce-out logic needed
+});
+    </script>
+</body>
+</html>
