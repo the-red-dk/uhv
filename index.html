@@ -1216,7 +1216,7 @@ button:active {
     "question": "'helping the nature to prosper' is an indicator of ",
     "options": ["protection ", "production ", "enrichment ", "right utilization "],
     "answer": "enrichment "
-  },
+    },
   {
     "question": "what type of production should be ensured at family level ",
     "options": ["tertiary ", "primary ", "secondary ", "none"],
@@ -1444,35 +1444,46 @@ shuffleArray(questions);
                 feedback.className = "feedback correct";
                 score++;
                 document.getElementById('score-counter').textContent = `Score: ${score}`;
+                radios.forEach(r => r.disabled = true);
+                // Auto-advance after countdown
+                let countdown = 2;
+                let counterDiv = document.getElementById('countdown');
+                if (!counterDiv) {
+                    counterDiv = document.createElement('div');
+                    counterDiv.id = 'countdown';
+                    counterDiv.style.fontWeight = 'bold';
+                    counterDiv.style.fontSize = '1.2em';
+                    counterDiv.style.margin = '10px 0 0 0';
+                    feedback.insertAdjacentElement('afterend', counterDiv);
+                }
+                counterDiv.textContent = `Next question in: ${countdown}`;
+                let ticks = 0;
+                const interval = setInterval(() => {
+                    ticks++;
+                    countdown--;
+                    if (countdown > 0) {
+                        counterDiv.textContent = `Next question in: ${countdown}`;
+                    } else {
+                        clearInterval(interval);
+                        counterDiv.remove();
+                        nextQuestion();
+                    }
+                }, 667);
             } else {
                 feedback.textContent = `Wrong! Correct answer: ${segmentQuestions[selectedSegment][current].answer}`;
                 feedback.className = "feedback wrong";
-            }
-            radios.forEach(r => r.disabled = true);
-            // Do NOT call saveProgress here; call it after incrementing current in nextQuestion
-            let countdown = 3;
-            let counterDiv = document.getElementById('countdown');
-            if (!counterDiv) {
-                counterDiv = document.createElement('div');
-                counterDiv.id = 'countdown';
-                counterDiv.style.fontWeight = 'bold';
-                counterDiv.style.fontSize = '1.2em';
-                counterDiv.style.margin = '10px 0 0 0';
-                feedback.insertAdjacentElement('afterend', counterDiv);
-            }
-            counterDiv.textContent = `Next question in: ${countdown}`;
-            let ticks = 0;
-            const interval = setInterval(() => {
-                ticks++;
-                countdown--;
-                if (countdown > 0) {
-                    counterDiv.textContent = `Next question in: ${countdown}`;
-                } else {
-                    clearInterval(interval);
-                    counterDiv.remove();
-                    nextQuestion();
+                radios.forEach(r => r.disabled = true);
+                // Show Next button for manual advance
+                let nextBtn = document.getElementById('next');
+                if (!nextBtn) {
+                    nextBtn = document.createElement('button');
+                    nextBtn.id = 'next';
+                    nextBtn.textContent = 'Next';
+                    nextBtn.style.marginTop = '14px';
+                    nextBtn.onclick = nextQuestion;
+                    feedback.insertAdjacentElement('afterend', nextBtn);
                 }
-            }, 667);
+            }
         }
         function nextQuestion() {
             answered = false;
