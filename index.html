@@ -7,15 +7,17 @@
     <style>
         body {
             font-family: 'Quicksand', 'Segoe UI', 'Roboto', Arial, sans-serif;
-            background: linear-gradient(135deg, #ffe0ef 0%, #ffd6ec 100%);
+            background: url('bg.png') center center/cover no-repeat fixed, linear-gradient(135deg, #ffe0ef 0%, #ffd6ec 100%);
             margin: 0;
             min-height: 100vh;
             color: #a14c7e;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Changed from flex-start to center */
-            height: 100vh; /* Ensure full viewport height for vertical centering */
+            justify-content: center;
+            height: 100vh;
+            background-size: cover;
+            background-attachment: fixed;
         }
         .main-heading {
             text-align: center;
@@ -147,18 +149,130 @@ button:active {
   border-bottom: 2px solid rgb(50, 50, 50);
   transition: background 0.12s, border-bottom 0.12s, color 0.12s;
 }
-        @media (max-width: 600px) {
+@media (max-width: 600px) {
             .main-heading { font-size: 1.2em; margin-top: 18px; }
             .quiz-container { max-width: 99vw; padding: 8px 2vw; }
             .question { font-size: 0.98em; }
             .options li { font-size: 0.95em; padding: 7px 4px; }
         }
+        /* Leaderboard button style (customized for your theme) */
+.button {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background: none;
+  color: #e75480;
+  cursor: pointer;
+  position: relative;
+  padding: 8px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 15px;
+  transition: all .15s ease;
+}
+.button::before,
+.button::after {
+  content: '';
+  display: block;
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: calc(50% - 5px);
+  border: 1px solid #e75480;
+  transition: all .15s ease;
+}
+.button::before { top: 0; border-bottom-width: 0; }
+.button::after { bottom: 0; border-top-width: 0; }
+.button:active,
+.button:focus { outline: none; }
+.button:active::before,
+.button:active::after { right: 3px; left: 3px; }
+.button:active::before { top: 3px; }
+.button:active::after { bottom: 3px; }
+.button_lg {
+  position: relative;
+  display: block;
+  padding: 10px 22px;
+  color: #fff;
+  background-color: #e75480;
+  overflow: hidden;
+  box-shadow: inset 0px 0px 0px 1px transparent;
+  border-radius: 0.7rem;
+}
+.button_lg::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 2px;
+  background-color: #e75480;
+}
+.button_lg::after {
+  content: '';
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 4px;
+  height: 4px;
+  background-color: #e75480;
+  transition: all .2s ease;
+}
+.button_sl {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: -1px;
+  left: -8px;
+  width: 0;
+  background-color: #fff0f7;
+  transform: skew(-15deg);
+  transition: all .2s ease;
+}
+.button_text { position: relative; }
+.button:hover { color: #e75480; }
+.button:hover .button_sl { width: calc(100% + 15px); }
+.button:hover .button_lg::after { background-color: #fff; }
+.segment-btn {
+  font-size: 1em;
+  padding: 10px 22px;
+  border-radius: 0.7rem;
+  background: #e75480;
+  color: #fff;
+  border: 2px solid rgb(50,50,50);
+  margin: 0 auto;
+  min-width: 270px; /* Set to width of Segment 5 or as needed */
+  max-width: 100%;
+  width: 270px; /* Default width for all segment buttons */
+  box-sizing: border-box;
+  transition: min-width 0.2s, width 0.2s;
+  white-space: normal;
+  word-break: break-word;
+  display: block;
+}
+.segment-btn.expanded {
+  min-width: 270px;
+  width: auto;
+}
+@media (max-width: 600px) {
+  .segment-btn, .segment-btn.expanded {
+    min-width: 0;
+    width: 98vw;
+    max-width: 99vw;
+    font-size: 0.98em;
+    padding: 8px 2vw;
+  }
+}
     </style>
 </head>
 <body>
         <div class="main-heading">UHV - Test Your Marks</div>
         <div class="quiz-container" id="quiz">
-            <!-- Quiz will be rendered here -->
+            <!-- Quiz or segment selection will be rendered here -->
         </div>
         <script>
         // Questions array replaced with 200 questions from uhv.json (unnumbered)
@@ -1189,10 +1303,91 @@ function shuffleArray(arr) {
 }
 shuffleArray(questions);
 
+        // --- SEGMENTED QUIZ LOGIC ---
+        const SEGMENT_SIZE = 40;
+        const TOTAL_SEGMENTS = 5;
+        const segmentQuestions = [];
+        for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+            segmentQuestions.push(questions.slice(i * SEGMENT_SIZE, (i + 1) * SEGMENT_SIZE));
+        }
+        let selectedSegment = null;
         let current = 0, score = 0, answered = false;
 
+        function getProgressKey(segment) {
+            return `quiz_progress_segment_${segment}`;
+        }
+        function saveProgress() {
+            if (selectedSegment === null) return;
+            localStorage.setItem(getProgressKey(selectedSegment), JSON.stringify({ current, score }));
+        }
+        function loadProgress(segment) {
+            const data = localStorage.getItem(getProgressKey(segment));
+            if (!data) return null;
+            try { return JSON.parse(data); } catch { return null; }
+        }
+        function clearProgress(segment) {
+            localStorage.removeItem(getProgressKey(segment));
+        }
+        function renderSegmentSelection() {
+            const quiz = document.getElementById('quiz');
+            // Calculate total progress and score
+            let totalAnswered = 0, totalScore = 0;
+            for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+                const progress = loadProgress(i);
+                if (progress) {
+                    totalAnswered += Math.min(progress.current, SEGMENT_SIZE);
+                    totalScore += progress.score;
+                }
+            }
+            const totalQuestions = SEGMENT_SIZE * TOTAL_SEGMENTS;
+            const completePercent = Math.round((totalAnswered / totalQuestions) * 100);
+            const scorePercent = totalAnswered > 0 ? Math.round((totalScore / totalAnswered) * 100) : 0;
+            let html = `<div style="text-align:center;margin-bottom:18px;font-size:1.2em;font-weight:700;color:#e75480;">Select a Segment</div>`;
+            html += `<div style="text-align:center;margin-bottom:10px;font-size:1em;color:#a14c7e;">Different segments, so you can take breaks occasionally, and finish a whole segment till you take a break✨</div>`;
+            html += `<div style="text-align:center;margin-bottom:18px;font-size:1em;color:#e75480;font-weight:600;">Total Complete: ${completePercent}% &nbsp;|&nbsp; Total Score: ${scorePercent}%</div>`;
+            html += '<div style="display:flex;flex-direction:column;gap:16px;">';
+            for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+                const progress = loadProgress(i);
+                let label = `Segment ${i+1} (Q${i*SEGMENT_SIZE+1}-${(i+1)*SEGMENT_SIZE})`;
+                let btnClass = 'segment-btn';
+                if (progress) btnClass += ' expanded';
+                if (progress) {
+                    label += ` — Progress: Q${progress.current+1}/${SEGMENT_SIZE}, Score: ${progress.score}`;
+                }
+                html += `<button onclick="selectSegment(${i})" class="${btnClass}">${label}</button>`;
+            }
+            html += `<button onclick="resetAllProgress()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#fff;color:#e75480;border:2px solid #e75480;margin:24px auto 0 auto;">Reset All Progress</button>`;
+            html += '</div>';
+            quiz.innerHTML = html;
+        }
+        window.resetAllProgress = function() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                for (let i = 0; i < TOTAL_SEGMENTS; i++) clearProgress(i);
+                localStorage.removeItem('quiz_segment_scores');
+                renderSegmentSelection();
+            }
+        };
+        window.selectSegment = function(i) {
+            const progress = loadProgress(i);
+            if (progress) {
+                if (confirm(`Continue Segment ${i+1} from Q${progress.current+1}? (Cancel to restart)`)) {
+                    selectedSegment = i;
+                    current = progress.current;
+                    score = progress.score;
+                    renderQuestion();
+                    return;
+                } else {
+                    clearProgress(i);
+                }
+            }
+            selectedSegment = i;
+            current = 0;
+            score = 0;
+            renderQuestion();
+        };
+        // --- MODIFIED QUIZ LOGIC ---
         function renderQuestion() {
-            const q = questions[current];
+            const q = segmentQuestions[selectedSegment][current];
             const quiz = document.getElementById('quiz');
             quiz.innerHTML = `
                 <div id="score-counter" style="font-size:1.1em;font-weight:700;color:#e75480;margin-bottom:10px;text-align:center;">Score: ${score}</div>
@@ -1210,18 +1405,15 @@ shuffleArray(questions);
                 <div class="feedback" id="feedback"></div>
                 <button id="submit" ${answered ? 'disabled' : ''}>Submit</button>
                 <div id="countdown" style="font-weight:bold; font-size:1.2em; margin:10px 0 0 0;"></div>
-                <div style="margin-top:18px;font-size:1.1em;">Question ${current+1} of ${questions.length}</div>
+                <div style="margin-top:18px;font-size:1.1em;">Question ${current+1} of ${SEGMENT_SIZE} (Segment ${selectedSegment+1})</div>
+                <button onclick="renderSegmentSelection()" style="margin-top:12px;font-size:0.95em;background:#fff;color:#e75480;border:2px solid #e75480;">Back to Segment Selection</button>
             `;
-
             document.getElementById('submit').onclick = submitAnswer;
-            // Highlight selected option if any
             if(window.selectedOptionIdx !== undefined) {
                 const lis = document.querySelectorAll('.options li');
                 lis[window.selectedOptionIdx]?.classList.add('selected');
             }
         }
-
-        // Make the whole option selectable
         window.selectedOptionIdx = undefined;
         function selectOption(idx) {
             if(answered) return;
@@ -1233,7 +1425,6 @@ shuffleArray(questions);
             });
             document.getElementById('feedback').textContent = '';
         }
-
         function submitAnswer() {
             const radios = document.querySelectorAll('input[name="option"]');
             let selected = null;
@@ -1246,23 +1437,19 @@ shuffleArray(questions);
             }
             answered = true;
             document.getElementById('submit').disabled = true;
-            // Remove Next button if present
             const nextBtn = document.getElementById('next');
             if (nextBtn) nextBtn.remove();
-            if (selected === questions[current].answer) {
+            if (selected === segmentQuestions[selectedSegment][current].answer) {
                 feedback.textContent = "Correct!";
                 feedback.className = "feedback correct";
                 score++;
-                // Update score counter immediately
                 document.getElementById('score-counter').textContent = `Score: ${score}`;
             } else {
-                feedback.textContent = `Wrong! Correct answer: ${questions[current].answer}`;
+                feedback.textContent = `Wrong! Correct answer: ${segmentQuestions[selectedSegment][current].answer}`;
                 feedback.className = "feedback wrong";
             }
-            // Disable all radios
             radios.forEach(r => r.disabled = true);
-
-            // Add 2-second countdown: 3, 2, 1 (each for ~0.67s)
+            // Do NOT call saveProgress here; call it after incrementing current in nextQuestion
             let countdown = 3;
             let counterDiv = document.getElementById('countdown');
             if (!counterDiv) {
@@ -1285,38 +1472,46 @@ shuffleArray(questions);
                     counterDiv.remove();
                     nextQuestion();
                 }
-            }, 667); // 2 seconds for 3,2,1
+            }, 667);
         }
-
         function nextQuestion() {
             answered = false;
             window.selectedOptionIdx = undefined;
             current++;
-            if (current < questions.length) {
+            if (current < SEGMENT_SIZE) {
+                saveProgress();
                 renderQuestion();
             } else {
+                // Save this segment's score to a summary array
+                let segmentScores = JSON.parse(localStorage.getItem('quiz_segment_scores') || '[]');
+                segmentScores[selectedSegment] = score;
+                localStorage.setItem('quiz_segment_scores', JSON.stringify(segmentScores));
+                clearProgress(selectedSegment);
                 showResult();
             }
         }
-
         function showResult() {
-            const quiz = document.getElementById('quiz');
-            const percent = Math.round((score / questions.length) * 100);
-            quiz.innerHTML = `
-                <div class="question">Quiz Completed!</div>
-                <div class="feedback correct">Your Score: ${score} / ${questions.length}</div>
-                <div class="feedback">Percentage: ${percent}%</div>
-                <button onclick="location.reload()">Restart</button>
-            `;
+            // Check if all segments are completed
+            let allDone = true;
+            for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+                if (loadProgress(i)) { allDone = false; break; }
+            }
+            if (allDone) {
+                // All segments done: just return to segment selection
+                renderSegmentSelection();
+            } else {
+                const quiz = document.getElementById('quiz');
+                const percent = Math.round((score / SEGMENT_SIZE) * 100);
+                quiz.innerHTML = `
+                    <div class="question">Segment Completed!</div>
+                    <div class="feedback correct">Your Score: ${score} / ${SEGMENT_SIZE}</div>
+                    <div class="feedback">Percentage: ${percent}%</div>
+                    <button onclick="renderSegmentSelection()">Back to Segment Selection</button>
+                `;
+            }
         }
-
-        renderQuestion();
-    </script>
-    <script>
-// Remove bounce-out animation logic
-window.addEventListener('DOMContentLoaded', function() {
-  // No bounce-out logic needed
-});
+        // Initial call to render the segment selection
+        renderSegmentSelection();
     </script>
 </body>
 </html>
