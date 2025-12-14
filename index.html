@@ -1304,7 +1304,16 @@ const questions = [].concat(window.module1 || [], window.module2 || [], window.m
     }
   }
   return {
+    // Shuffle options so correct answers appear under random positions
     ...q,
+    options: (Array.isArray(q.options) ? (() => {
+      const arr = q.options.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    })() : q.options),
     question: typeof q.question === 'string' ? q.question.replace(/^\s*\d+\.?\s*/, '') : q.question
   };
 });
