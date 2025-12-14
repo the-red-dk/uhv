@@ -1292,7 +1292,13 @@ button:active {
     "answer": "enrichment and protection of Natural resources"
   }
 */
-const questions = [].concat(window.module1 || [], window.module2 || [], window.module3 || [], window.module4 || [], window.module5 || []).map(q => {
+const questions = []
+  .concat((window.module1 || []).map(q => ({...q, moduleIndex: 0})))
+  .concat((window.module2 || []).map(q => ({...q, moduleIndex: 1})))
+  .concat((window.module3 || []).map(q => ({...q, moduleIndex: 2})))
+  .concat((window.module4 || []).map(q => ({...q, moduleIndex: 3})))
+  .concat((window.module5 || []).map(q => ({...q, moduleIndex: 4})))
+  .map(q => {
   // Build option objects, shuffle, and ensure answer text matches the shuffled correct option
   const norm = s => typeof s === 'string' ? s.replace(/\s+/g, ' ').trim().toLowerCase() : s;
   let optionsArray = q.options;
@@ -1320,6 +1326,7 @@ const questions = [].concat(window.module1 || [], window.module2 || [], window.m
     ...q,
     options: optionsArray,
     answer: answerText,
+    moduleIndex: q.moduleIndex,
     question: typeof q.question === 'string' ? q.question.replace(/^\s*\d+\.?\s*/, '') : q.question
   };
 });
@@ -1407,6 +1414,7 @@ shuffleArray(questions);
                 html += `<button onclick="selectSegment(${i})" class="${btnClass}">${label}</button>`;
             }
             html += `<button onclick="resetAllProgress()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#fff;color:#e75480;border:2px solid #e75480;margin:24px auto 0 auto;">Reset All Progress</button>`;
+            html += `<button onclick="showModuleStats()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#e75480;color:#fff;border:2px solid #e75480;margin:8px auto 0 auto;">Module Stats</button>`;
             html += '</div>';
             quiz.innerHTML = html;
         }
@@ -1414,8 +1422,30 @@ shuffleArray(questions);
             if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
                 for (let i = 0; i < TOTAL_SEGMENTS; i++) clearProgress(i);
                 localStorage.removeItem('quiz_segment_scores');
+                localStorage.removeItem('quiz_module_stats');
                 renderSegmentSelection();
             }
+        };
+        window.showModuleStats = function() {
+            const moduleStats = JSON.parse(localStorage.getItem('quiz_module_stats') || '{}');
+            const moduleNames = ['Module 1: Basic Concepts', 'Module 2: Water & Waste', 'Module 3: (Module 3)', 'Module 4: Disaster Management', 'Module 5: (Module 5)'];
+            let statsHTML = '<div style="text-align:center;margin-bottom:18px;font-size:1.2em;font-weight:700;color:#e75480;">Module Statistics</div>';
+            statsHTML += '<div style="font-size:0.95em;color:#a14c7e;line-height:1.8;">';
+            let hasStats = false;
+            for (let i = 0; i < 5; i++) {
+                const stats = moduleStats[i];
+                if (stats && stats.total > 0) {
+                    hasStats = true;
+                    const percent = Math.round((stats.correct / stats.total) * 100);
+                    statsHTML += `<div style="margin-bottom:8px;"><strong>${moduleNames[i]}:</strong> ${stats.correct}/${stats.total} correct (${percent}%)</div>`;
+                }
+            }
+            if (!hasStats) {
+                statsHTML += '<div style="text-align:center;color:#e75480;">No questions attempted yet</div>';
+            }
+            statsHTML += '</div>';
+            statsHTML += '<button onclick="renderSegmentSelection()" style="margin-top:18px;font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#e75480;color:#fff;border:none;">Back to Segments</button>';
+            document.getElementById('quiz').innerHTML = statsHTML;
         };
         window.selectSegment = function(i) {
             const progress = loadProgress(i);
@@ -1489,11 +1519,21 @@ shuffleArray(questions);
             document.getElementById('submit').disabled = true;
             const nextBtn = document.getElementById('next');
             if (nextBtn) nextBtn.remove();
-            if (selected === segmentQuestions[selectedSegment][current].answer) {
+            const currentQ = segmentQuestions[selectedSegment][current];
+            const isCorrect = selected === currentQ.answer;
+            if (isCorrect) {
                 feedback.textContent = "Correct!";
                 feedback.className = "feedback correct";
                 score++;
                 document.getElementById('score-counter').textContent = `Score: ${score}`;
+                // Track module stats
+                if (currentQ.moduleIndex !== undefined) {
+                    let moduleStats = JSON.parse(localStorage.getItem('quiz_module_stats') || '{}');
+                    if (!moduleStats[currentQ.moduleIndex]) moduleStats[currentQ.moduleIndex] = {correct: 0, total: 0};
+                    moduleStats[currentQ.moduleIndex].correct++;
+                    moduleStats[currentQ.moduleIndex].total++;
+                    localStorage.setItem('quiz_module_stats', JSON.stringify(moduleStats));
+                }
                 radios.forEach(r => r.disabled = true);
                 // Auto-advance after countdown
                 let countdown = 2;
@@ -1520,8 +1560,15 @@ shuffleArray(questions);
                     }
                 }, 667);
             } else {
-                feedback.textContent = `Wrong! Correct answer: ${segmentQuestions[selectedSegment][current].answer}`;
+                feedback.textContent = `Wrong! Correct answer: ${currentQ.answer}`;
                 feedback.className = "feedback wrong";
+                // Track module stats
+                if (currentQ.moduleIndex !== undefined) {
+                    let moduleStats = JSON.parse(localStorage.getItem('quiz_module_stats') || '{}');
+                    if (!moduleStats[currentQ.moduleIndex]) moduleStats[currentQ.moduleIndex] = {correct: 0, total: 0};
+                    moduleStats[currentQ.moduleIndex].total++;
+                    localStorage.setItem('quiz_module_stats', JSON.stringify(moduleStats));
+                }
                 radios.forEach(r => r.disabled = true);
                 // Show Next button for manual advance
                 let nextBtn = document.getElementById('next');
