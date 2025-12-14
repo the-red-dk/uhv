@@ -1353,7 +1353,8 @@ shuffleArray(questions);
         
         // Helper function to get segment size
         function getSegmentSize(segmentIndex) {
-            return segmentIndex < 5 ? 40 : 50;
+          const seg = segmentQuestions[segmentIndex];
+          return (seg && seg.length) ? seg.length : (segmentIndex < 5 ? 40 : 50);
         }
         let selectedSegment = null;
         let current = 0, score = 0, answered = false;
@@ -1509,7 +1510,13 @@ shuffleArray(questions);
         };
         // --- MODIFIED QUIZ LOGIC ---
         function renderQuestion() {
-            const q = segmentQuestions[selectedSegment][current];
+          const seg = segmentQuestions[selectedSegment] || [];
+          const segLen = seg.length;
+          if (current >= segLen) {
+            showResult();
+            return;
+          }
+          const q = seg[current];
             const quiz = document.getElementById('quiz');
             quiz.innerHTML = `
                 <div id="score-counter" style="font-size:1.1em;font-weight:700;color:#e75480;margin-bottom:10px;text-align:center;">Score: ${score}</div>
@@ -1628,8 +1635,9 @@ shuffleArray(questions);
             answered = false;
             window.selectedOptionIdx = undefined;
             current++;
-            const segSize = getSegmentSize(selectedSegment);
-            if (current < segSize) {
+          const seg = segmentQuestions[selectedSegment] || [];
+          const segSize = seg.length;
+          if (current < segSize) {
                 saveProgress();
                 renderQuestion();
             } else {
@@ -1653,15 +1661,15 @@ shuffleArray(questions);
                 // All segments done: just return to segment selection
                 renderSegmentSelection();
             } else {
-                const quiz = document.getElementById('quiz');
-                const segSize = getSegmentSize(selectedSegment);
-                const percent = Math.round((score / segSize) * 100);
-                quiz.innerHTML = `
-                    <div class="question">Segment Completed!</div>
-                    <div class="feedback correct">Your Score: ${score} / ${segSize}</div>
-                    <div class="feedback">Percentage: ${percent}%</div>
-                    <button onclick="renderSegmentSelection()">Back to Segment Selection</button>
-                `;
+              const quiz = document.getElementById('quiz');
+              const segSize = getSegmentSize(selectedSegment);
+              const percent = segSize > 0 ? Math.round((score / segSize) * 100) : 0;
+              quiz.innerHTML = `
+                <div class="question">Segment Completed!</div>
+                <div class="feedback correct">Your Score: ${score} / ${segSize}</div>
+                <div class="feedback">Percentage: ${percent}%</div>
+                <button onclick="renderSegmentSelection()">Back to Segment Selection</button>
+              `;
             }
         }
         // Initial call to render the segment selection
