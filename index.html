@@ -1358,6 +1358,11 @@ shuffleArray(questions);
         }
         let selectedSegment = null;
         let current = 0, score = 0, answered = false;
+        // Wrong-attempt retry state (separate from main quiz)
+        let wrongQuestions = [];
+        let wrongCurrent = 0;
+        let wrongAnswered = false;
+        let wrongSelectedIdx = undefined;
 
         function getProgressKey(segment) {
             return `quiz_progress_segment_${segment}`;
@@ -1416,6 +1421,8 @@ shuffleArray(questions);
             }
             html += `<button onclick="resetAllProgress()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#fff;color:#e75480;border:2px solid #e75480;margin:24px auto 0 auto;">Reset All Progress</button>`;
             html += `<button onclick="showModuleStats()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#e75480;color:#fff;border:2px solid #e75480;margin:8px auto 0 auto;">Module Stats</button>`;
+            html += `<button onclick="showWrongQuestions()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#fff;color:#e75480;border:2px solid #e75480;margin:8px auto 0 auto;">Wrong Attempts (list)</button>`;
+            html += `<button onclick="startWrongAttempts()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#e75480;color:#fff;border:2px solid #e75480;margin:8px auto 0 auto;">Retry Wrong Attempts</button>`;
             html += '</div>';
             quiz.innerHTML = html;
         }
@@ -1424,6 +1431,7 @@ shuffleArray(questions);
                 for (let i = 0; i < TOTAL_SEGMENTS; i++) clearProgress(i);
                 localStorage.removeItem('quiz_segment_scores');
                 localStorage.removeItem('quiz_module_stats');
+            localStorage.removeItem('quiz_wrong_questions');
                 renderSegmentSelection();
             }
         };
@@ -1490,6 +1498,129 @@ shuffleArray(questions);
             statsHTML += '<button onclick="renderSegmentSelection()" style="margin-top:18px;font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#e75480;color:#fff;border:none;">Back to Segments</button>';
             document.getElementById('quiz').innerHTML = statsHTML;
         };
+          window.showWrongQuestions = function() {
+            const wrong = JSON.parse(localStorage.getItem('quiz_wrong_questions') || '[]');
+            const moduleNames = ['Module 1: Basic Concepts', 'Module 2: Water & Waste', 'Module 3: (Module 3)', 'Module 4: Disaster Management', 'Module 5: (Module 5)'];
+            let html = '<div style="text-align:center;margin-bottom:18px;font-size:1.2em;font-weight:700;color:#e75480;">Wrong Attempts</div>';
+            if (!wrong.length) {
+              html += '<div style="text-align:center;color:#e75480;">No wrong attempts logged yet</div>';
+            } else {
+              html += '<div style="display:flex;flex-direction:column;gap:14px;font-size:0.95em;color:#a14c7e;">';
+              wrong.forEach((item, idx) => {
+                const modName = item.moduleIndex !== undefined ? moduleNames[item.moduleIndex] || `Module ${item.moduleIndex+1}` : 'Module ?';
+                html += `
+                  <div style="border:2px solid #f8b6d2;border-radius:12px;padding:12px;background:#fff0f7;">
+                    <div style="font-weight:700;color:#e75480;margin-bottom:6px;">${idx+1}. ${item.question || ''}</div>
+                    <div style="margin-bottom:4px;"><strong>Module:</strong> ${modName}</div>
+                    <div style="margin-bottom:4px;"><strong>Your Answer:</strong> ${item.selected || ''}</div>
+                    <div style="margin-bottom:4px;"><strong>Correct Answer:</strong> ${item.correct || ''}</div>
+                    ${item.options ? `<div style="margin-top:6px;"><strong>Options:</strong> ${item.options.join(' | ')}</div>` : ''}
+                  </div>`;
+              });
+              html += '</div>';
+            }
+            html += '<button onclick="renderSegmentSelection()" style="margin-top:18px;font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#e75480;color:#fff;border:none;">Back to Segments</button>';
+            document.getElementById('quiz').innerHTML = html;
+          };
+          window.startWrongAttempts = function() {
+            const wrong = JSON.parse(localStorage.getItem('quiz_wrong_questions') || '[]');
+            if (!wrong.length) {
+              alert('No wrong attempts logged yet.');
+              return;
+            }
+            // Use the logged wrong questions as-is; do not affect scores/progress
+            wrongQuestions = wrong.slice();
+            wrongCurrent = 0;
+            wrongAnswered = false;
+            wrongSelectedIdx = undefined;
+            renderWrongQuestion();
+          };
+          function renderWrongQuestion() {
+            const seg = wrongQuestions;
+            const segLen = seg.length;
+            if (wrongCurrent >= segLen) {
+              const quiz = document.getElementById('quiz');
+              quiz.innerHTML = `
+                <div class="question">Wrong Attempts Retried!</div>
+                <div class="feedback">You have finished the wrong-attempt set.</div>
+                <button onclick="renderSegmentSelection()">Back to Segment Selection</button>
+              `;
+              return;
+            }
+            const q = seg[wrongCurrent];
+            const quiz = document.getElementById('quiz');
+            quiz.innerHTML = `
+              <div class="question">${wrongCurrent+1}. ${q.question || ''}</div>
+              <ul class="options">
+                ${(q.options || []).map((opt, i) => `
+                  <li tabindex="0" onclick="selectWrongOption(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){selectWrongOption(${i})}">
+                    <label style="width:100%;display:flex;align-items:center;cursor:pointer;">
+                      <input type="radio" name="wrong_option" value="${opt}" style="pointer-events:none;" ${wrongAnswered ? 'disabled' : ''}>
+                      <span style="flex:1;">${opt}</span>
+                    </label>
+                  </li>
+                `).join('')}
+              </ul>
+              <div class="feedback" id="wrong-feedback"></div>
+              <button id="wrong-submit" ${wrongAnswered ? 'disabled' : ''}>Submit</button>
+              <div style="margin-top:18px;font-size:1.1em;">Question ${wrongCurrent+1} of ${segLen} (Wrong Attempts)</div>
+              <button onclick="renderSegmentSelection()" style="margin-top:12px;font-size:0.95em;background:#fff;color:#e75480;border:2px solid #e75480;">Back to Segment Selection</button>
+            `;
+            document.getElementById('wrong-submit').onclick = submitWrongAttempt;
+            if(wrongSelectedIdx !== undefined) {
+              const lis = document.querySelectorAll('.options li');
+              lis[wrongSelectedIdx]?.classList.add('selected');
+            }
+          }
+          function selectWrongOption(idx) {
+            if(wrongAnswered) return;
+            wrongSelectedIdx = idx;
+            const lis = document.querySelectorAll('.options li');
+            lis.forEach((li, i) => {
+              li.classList.toggle('selected', i === idx);
+              li.querySelector('input[type="radio"]').checked = (i === idx);
+            });
+            const fb = document.getElementById('wrong-feedback');
+            if (fb) fb.textContent = '';
+          }
+          function submitWrongAttempt() {
+            const radios = document.querySelectorAll('input[name="wrong_option"]');
+            let selected = null;
+            radios.forEach((r, i) => { if(r.checked) selected = r.value; });
+            const feedback = document.getElementById('wrong-feedback');
+            if (!selected) {
+              feedback.textContent = "Please select an option.";
+              feedback.className = "feedback wrong";
+              return;
+            }
+            wrongAnswered = true;
+            document.getElementById('wrong-submit').disabled = true;
+            const q = wrongQuestions[wrongCurrent];
+            if (selected === q.correct) {
+              feedback.textContent = "Correct!";
+              feedback.className = "feedback correct";
+            } else {
+              feedback.textContent = `Wrong! Correct answer: ${q.correct}`;
+              feedback.className = "feedback wrong";
+            }
+            radios.forEach(r => r.disabled = true);
+            // Show Next button for manual advance
+            let nextBtn = document.getElementById('wrong-next');
+            if (!nextBtn) {
+              nextBtn = document.createElement('button');
+              nextBtn.id = 'wrong-next';
+              nextBtn.textContent = 'Next';
+              nextBtn.style.marginTop = '14px';
+              nextBtn.onclick = nextWrongQuestion;
+              feedback.insertAdjacentElement('afterend', nextBtn);
+            }
+          }
+          function nextWrongQuestion() {
+            wrongAnswered = false;
+            wrongSelectedIdx = undefined;
+            wrongCurrent++;
+            renderWrongQuestion();
+          }
         window.selectSegment = function(i) {
             const progress = loadProgress(i);
             if (progress) {
@@ -1609,26 +1740,39 @@ shuffleArray(questions);
                     }
                 }, 667);
             } else {
-                feedback.textContent = `Wrong! Correct answer: ${currentQ.answer}`;
-                feedback.className = "feedback wrong";
-                // Track module stats
-                if (currentQ.moduleIndex !== undefined) {
-                    let moduleStats = JSON.parse(localStorage.getItem('quiz_module_stats') || '{}');
-                    if (!moduleStats[currentQ.moduleIndex]) moduleStats[currentQ.moduleIndex] = {correct: 0, total: 0};
-                    moduleStats[currentQ.moduleIndex].total++;
-                    localStorage.setItem('quiz_module_stats', JSON.stringify(moduleStats));
-                }
-                radios.forEach(r => r.disabled = true);
-                // Show Next button for manual advance
-                let nextBtn = document.getElementById('next');
-                if (!nextBtn) {
-                    nextBtn = document.createElement('button');
-                    nextBtn.id = 'next';
-                    nextBtn.textContent = 'Next';
-                    nextBtn.style.marginTop = '14px';
-                    nextBtn.onclick = nextQuestion;
-                    feedback.insertAdjacentElement('afterend', nextBtn);
-                }
+              feedback.textContent = `Wrong! Correct answer: ${currentQ.answer}`;
+              feedback.className = "feedback wrong";
+              // Track module stats and wrong attempts
+              if (currentQ.moduleIndex !== undefined) {
+                let moduleStats = JSON.parse(localStorage.getItem('quiz_module_stats') || '{}');
+                if (!moduleStats[currentQ.moduleIndex]) moduleStats[currentQ.moduleIndex] = {correct: 0, total: 0};
+                moduleStats[currentQ.moduleIndex].total++;
+                localStorage.setItem('quiz_module_stats', JSON.stringify(moduleStats));
+              }
+              // Log wrong attempt
+              let wrongLog = JSON.parse(localStorage.getItem('quiz_wrong_questions') || '[]');
+              wrongLog.push({
+                question: currentQ.question,
+                options: currentQ.options,
+                correct: currentQ.answer,
+                selected: selected,
+                moduleIndex: currentQ.moduleIndex,
+                segment: selectedSegment,
+                timestamp: Date.now()
+              });
+              localStorage.setItem('quiz_wrong_questions', JSON.stringify(wrongLog));
+
+              radios.forEach(r => r.disabled = true);
+              // Show Next button for manual advance
+              let nextBtn = document.getElementById('next');
+              if (!nextBtn) {
+                nextBtn = document.createElement('button');
+                nextBtn.id = 'next';
+                nextBtn.textContent = 'Next';
+                nextBtn.style.marginTop = '14px';
+                nextBtn.onclick = nextQuestion;
+                feedback.insertAdjacentElement('afterend', nextBtn);
+              }
             }
         }
         function nextQuestion() {
