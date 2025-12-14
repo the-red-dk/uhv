@@ -270,13 +270,20 @@ button:active {
     </style>
 </head>
 <body>
-        <div class="main-heading">UHV - Test Your Marks</div>
+        <div class="main-heading">EVS - CV307 - Test Your Marks</div>
         <div class="quiz-container" id="quiz">
             <!-- Quiz or segment selection will be rendered here -->
         </div>
+        <script src="module1.js"></script>
+        <script src="module2.js"></script>
+        <script src="module3.js"></script>
+        <script src="module4.js"></script>
+        <script src="module5.js"></script>
         <script>
-        // Questions array replaced with 200 questions from uhv.json (unnumbered)
-        const questions = [
+        /*
+        Questions array replaced from legacy source (commented out). Using module1..module5 instead.
+        */
+/*        const questions = [
   {
     "question": "One of the basic desire of every human being is to be always ____________",
     "options": ["Sad", "Happy", "Laugh", "Earn money"],
@@ -1277,7 +1284,8 @@ button:active {
     "options": ["enrichment and protection of Natural resources", "prosperity in Human being ", "to ensure the availability of necessary physical facilities", "fulfilling the needs of everyone"],
     "answer": "enrichment and protection of Natural resources"
   }
-].map(q => {
+*/
+const questions = [].concat(window.module1 || [], window.module2 || [], window.module3 || [], window.module4 || [], window.module5 || []).map(q => {
   // Fix: Ensure answer matches exactly one of the options (including spaces and casing)
   if (Array.isArray(q.options)) {
     const match = q.options.find(opt => opt === q.answer);
