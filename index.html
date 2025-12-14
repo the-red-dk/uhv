@@ -1428,12 +1428,54 @@ shuffleArray(questions);
         };
         window.showModuleStats = function() {
             const moduleStats = JSON.parse(localStorage.getItem('quiz_module_stats') || '{}');
+            const segmentScores = JSON.parse(localStorage.getItem('quiz_segment_scores') || '[]');
             const moduleNames = ['Module 1: Basic Concepts', 'Module 2: Water & Waste', 'Module 3: (Module 3)', 'Module 4: Disaster Management', 'Module 5: (Module 5)'];
+            
+            // Build combined stats from tracked answers + completed segments
+            const combinedStats = {};
+            for (let i = 0; i < 5; i++) {
+                combinedStats[i] = {correct: 0, total: 0};
+            }
+            
+            // Add tracked answer stats
+            for (let i = 0; i < 5; i++) {
+                if (moduleStats[i]) {
+                    combinedStats[i].correct += moduleStats[i].correct || 0;
+                    combinedStats[i].total += moduleStats[i].total || 0;
+                }
+            }
+            
+            // Estimate stats from completed segments
+            for (let segIdx = 0; segIdx < TOTAL_SEGMENTS; segIdx++) {
+                if (segmentScores[segIdx] !== undefined && segmentScores[segIdx] !== null) {
+                    const segScore = segmentScores[segIdx];
+                    const segSize = getSegmentSize(segIdx);
+                    const segQuestions = segmentQuestions[segIdx];
+                    
+                    // Count questions per module in this segment
+                    const moduleCounts = {};
+                    for (let q of segQuestions) {
+                        if (q.moduleIndex !== undefined) {
+                            moduleCounts[q.moduleIndex] = (moduleCounts[q.moduleIndex] || 0) + 1;
+                        }
+                    }
+                    
+                    // Distribute score proportionally across modules
+                    const successRate = segScore / segSize;
+                    for (let modIdx in moduleCounts) {
+                        const count = moduleCounts[modIdx];
+                        const estimatedCorrect = Math.round(count * successRate);
+                        combinedStats[modIdx].correct += estimatedCorrect;
+                        combinedStats[modIdx].total += count;
+                    }
+                }
+            }
+            
             let statsHTML = '<div style="text-align:center;margin-bottom:18px;font-size:1.2em;font-weight:700;color:#e75480;">Module Statistics</div>';
             statsHTML += '<div style="font-size:0.95em;color:#a14c7e;line-height:1.8;">';
             let hasStats = false;
             for (let i = 0; i < 5; i++) {
-                const stats = moduleStats[i];
+                const stats = combinedStats[i];
                 if (stats && stats.total > 0) {
                     hasStats = true;
                     const percent = Math.round((stats.correct / stats.total) * 100);
