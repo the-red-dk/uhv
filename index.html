@@ -1339,13 +1339,18 @@ shuffleArray(questions);
         function renderSegmentSelection() {
             const quiz = document.getElementById('quiz');
             // Calculate total progress and score
-            let totalAnswered = 0, totalScore = 0;
+          let totalAnswered = 0, totalScore = 0;
+          const segmentScores = JSON.parse(localStorage.getItem('quiz_segment_scores') || '[]');
             for (let i = 0; i < TOTAL_SEGMENTS; i++) {
                 const progress = loadProgress(i);
-                if (progress) {
-                    totalAnswered += Math.min(progress.current, SEGMENT_SIZE);
-                    totalScore += progress.score;
-                }
+            if (progress) {
+              totalAnswered += Math.min(progress.current, SEGMENT_SIZE);
+              totalScore += progress.score || 0;
+            } else if (segmentScores[i] !== undefined && segmentScores[i] !== null) {
+              // Completed segment (no active progress) — count full segment and recorded score
+              totalAnswered += SEGMENT_SIZE;
+              totalScore += Number(segmentScores[i]) || 0;
+            }
             }
             const totalQuestions = SEGMENT_SIZE * TOTAL_SEGMENTS;
             const completePercent = Math.round((totalAnswered / totalQuestions) * 100);
@@ -1359,9 +1364,12 @@ shuffleArray(questions);
                 let label = `Segment ${i+1} (Q${i*SEGMENT_SIZE+1}-${(i+1)*SEGMENT_SIZE})`;
                 let btnClass = 'segment-btn';
                 if (progress) btnClass += ' expanded';
-                if (progress) {
-                    label += ` — Progress: Q${progress.current+1}/${SEGMENT_SIZE}, Score: ${progress.score}`;
-                }
+              if (progress) {
+                label += ` — Progress: Q${progress.current+1}/${SEGMENT_SIZE}, Score: ${progress.score}`;
+              } else if (segmentScores[i] !== undefined && segmentScores[i] !== null) {
+                btnClass += ' expanded';
+                label += ` — Completed: Score: ${segmentScores[i]}`;
+              }
                 html += `<button onclick="selectSegment(${i})" class="${btnClass}">${label}</button>`;
             }
             html += `<button onclick="resetAllProgress()" style="font-size:1em;padding:10px 22px;border-radius:0.7rem;background:#fff;color:#e75480;border:2px solid #e75480;margin:24px auto 0 auto;">Reset All Progress</button>`;
@@ -1511,10 +1519,12 @@ shuffleArray(questions);
         }
         function showResult() {
             // Check if all segments are completed
-            let allDone = true;
-            for (let i = 0; i < TOTAL_SEGMENTS; i++) {
-                if (loadProgress(i)) { allDone = false; break; }
-            }
+          let allDone = true;
+          const segmentScores = JSON.parse(localStorage.getItem('quiz_segment_scores') || '[]');
+          for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+            // If there's active progress or no stored completed score, it's not done
+            if (loadProgress(i) || (segmentScores[i] === undefined || segmentScores[i] === null)) { allDone = false; break; }
+          }
             if (allDone) {
                 // All segments done: just return to segment selection
                 renderSegmentSelection();
