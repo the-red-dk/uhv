@@ -18,6 +18,13 @@
             height: 100vh;
             background-size: cover;
             background-attachment: fixed;
+          /* Disable text selection and long-press selection on mobile */
+          -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE10+/Edge */
+          user-select: none; /* Standard */
+          -webkit-touch-callout: none; /* Disable callout, iOS */
+          -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
         }
         .main-heading {
             text-align: center;
