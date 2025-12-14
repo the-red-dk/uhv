@@ -1293,27 +1293,33 @@ button:active {
   }
 */
 const questions = [].concat(window.module1 || [], window.module2 || [], window.module3 || [], window.module4 || [], window.module5 || []).map(q => {
-  // Fix: Ensure answer matches exactly one of the options (including spaces and casing)
+  // Build option objects, shuffle, and ensure answer text matches the shuffled correct option
+  const norm = s => typeof s === 'string' ? s.replace(/\s+/g, ' ').trim().toLowerCase() : s;
+  let optionsArray = q.options;
+  let answerText = q.answer;
   if (Array.isArray(q.options)) {
-    const match = q.options.find(opt => opt === q.answer);
-    if (!match) {
-      // Try to match ignoring spaces/casing, then set answer to the exact option string
-      const norm = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
-      const found = q.options.find(opt => norm(opt) === norm(q.answer));
-      if (found) q.answer = found;
+    const opts = q.options.map(opt => ({
+      text: opt,
+      isAnswer: norm(opt) === norm(q.answer)
+    }));
+    // If no option marked as answer (e.g., mismatch), try exact match fallback
+    if (!opts.some(o => o.isAnswer)) {
+      const exact = opts.find(o => o.text === q.answer);
+      if (exact) exact.isAnswer = true;
     }
+    // Shuffle options
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [opts[i], opts[j]] = [opts[j], opts[i]];
+    }
+    const correct = opts.find(o => o.isAnswer) || opts[0];
+    optionsArray = opts.map(o => o.text);
+    answerText = correct.text;
   }
   return {
-    // Shuffle options so correct answers appear under random positions
     ...q,
-    options: (Array.isArray(q.options) ? (() => {
-      const arr = q.options.slice();
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    })() : q.options),
+    options: optionsArray,
+    answer: answerText,
     question: typeof q.question === 'string' ? q.question.replace(/^\s*\d+\.?\s*/, '') : q.question
   };
 });
@@ -1329,10 +1335,18 @@ shuffleArray(questions);
 
         // --- SEGMENTED QUIZ LOGIC ---
         const SEGMENT_SIZE = 40;
-        const TOTAL_SEGMENTS = 5;
+        const TOTAL_SEGMENTS = 6;
         const segmentQuestions = [];
-        for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+        // Segments 0-4: 40 questions each (200 total)
+        for (let i = 0; i < 5; i++) {
             segmentQuestions.push(questions.slice(i * SEGMENT_SIZE, (i + 1) * SEGMENT_SIZE));
+        }
+        // Segment 5: remaining 50 questions (201-250)
+        segmentQuestions.push(questions.slice(200, 250));
+        
+        // Helper function to get segment size
+        function getSegmentSize(segmentIndex) {
+            return segmentIndex < 5 ? 40 : 50;
         }
         let selectedSegment = null;
         let current = 0, score = 0, answered = false;
@@ -1359,16 +1373,17 @@ shuffleArray(questions);
           const segmentScores = JSON.parse(localStorage.getItem('quiz_segment_scores') || '[]');
             for (let i = 0; i < TOTAL_SEGMENTS; i++) {
                 const progress = loadProgress(i);
+                const segSize = getSegmentSize(i);
             if (progress) {
-              totalAnswered += Math.min(progress.current, SEGMENT_SIZE);
+              totalAnswered += Math.min(progress.current, segSize);
               totalScore += progress.score || 0;
             } else if (segmentScores[i] !== undefined && segmentScores[i] !== null) {
               // Completed segment (no active progress) — count full segment and recorded score
-              totalAnswered += SEGMENT_SIZE;
+              totalAnswered += segSize;
               totalScore += Number(segmentScores[i]) || 0;
             }
             }
-            const totalQuestions = SEGMENT_SIZE * TOTAL_SEGMENTS;
+            const totalQuestions = 250;
             const completePercent = Math.round((totalAnswered / totalQuestions) * 100);
             const scorePercent = totalAnswered > 0 ? Math.round((totalScore / totalAnswered) * 100) : 0;
             let html = `<div style="text-align:center;margin-bottom:18px;font-size:1.2em;font-weight:700;color:#e75480;">Select a Segment</div>`;
@@ -1377,11 +1392,14 @@ shuffleArray(questions);
             html += '<div style="display:flex;flex-direction:column;gap:16px;">';
             for (let i = 0; i < TOTAL_SEGMENTS; i++) {
                 const progress = loadProgress(i);
-                let label = `Segment ${i+1} (Q${i*SEGMENT_SIZE+1}-${(i+1)*SEGMENT_SIZE})`;
+                const segSize = getSegmentSize(i);
+                const startQ = i < 5 ? (i * 40 + 1) : 201;
+                const endQ = i < 5 ? ((i + 1) * 40) : 250;
+                let label = `Segment ${i+1} (Q${startQ}-${endQ})`;
                 let btnClass = 'segment-btn';
                 if (progress) btnClass += ' expanded';
               if (progress) {
-                label += ` — Progress: Q${progress.current+1}/${SEGMENT_SIZE}, Score: ${progress.score}`;
+                label += ` — Progress: Q${progress.current+1}/${segSize}, Score: ${progress.score}`;
               } else if (segmentScores[i] !== undefined && segmentScores[i] !== null) {
                 btnClass += ' expanded';
                 label += ` — Completed: Score: ${segmentScores[i]}`;
@@ -1437,7 +1455,7 @@ shuffleArray(questions);
                 <div class="feedback" id="feedback"></div>
                 <button id="submit" ${answered ? 'disabled' : ''}>Submit</button>
                 <div id="countdown" style="font-weight:bold; font-size:1.2em; margin:10px 0 0 0;"></div>
-                <div style="margin-top:18px;font-size:1.1em;">Question ${current+1} of ${SEGMENT_SIZE} (Segment ${selectedSegment+1})</div>
+                <div style="margin-top:18px;font-size:1.1em;">Question ${current+1} of ${getSegmentSize(selectedSegment)} (Segment ${selectedSegment+1})</div>
                 <button onclick="renderSegmentSelection()" style="margin-top:12px;font-size:0.95em;background:#fff;color:#e75480;border:2px solid #e75480;">Back to Segment Selection</button>
             `;
             document.getElementById('submit').onclick = submitAnswer;
@@ -1521,7 +1539,8 @@ shuffleArray(questions);
             answered = false;
             window.selectedOptionIdx = undefined;
             current++;
-            if (current < SEGMENT_SIZE) {
+            const segSize = getSegmentSize(selectedSegment);
+            if (current < segSize) {
                 saveProgress();
                 renderQuestion();
             } else {
@@ -1546,10 +1565,11 @@ shuffleArray(questions);
                 renderSegmentSelection();
             } else {
                 const quiz = document.getElementById('quiz');
-                const percent = Math.round((score / SEGMENT_SIZE) * 100);
+                const segSize = getSegmentSize(selectedSegment);
+                const percent = Math.round((score / segSize) * 100);
                 quiz.innerHTML = `
                     <div class="question">Segment Completed!</div>
-                    <div class="feedback correct">Your Score: ${score} / ${SEGMENT_SIZE}</div>
+                    <div class="feedback correct">Your Score: ${score} / ${segSize}</div>
                     <div class="feedback">Percentage: ${percent}%</div>
                     <button onclick="renderSegmentSelection()">Back to Segment Selection</button>
                 `;
